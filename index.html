@@ -2,14 +2,14 @@
 <html>
 <head>
   <title>맛집 추천</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 모바일 반응형을 위한 뷰포트 설정 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
       height: 100%;
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
-      overflow: hidden; /* 모바일에서 불필요한 스크롤 방지 */
+      overflow: hidden;
     }
     #map {
       height: 100%;
@@ -28,12 +28,12 @@
       padding: 10px;
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      width: 90%; /* 모바일에서 너무 좁지 않게 */
-      max-width: 400px; /* 데스크톱에서 너무 넓지 않게 */
+      width: 90%;
+      max-width: 400px;
       box-sizing: border-box;
     }
     #searchInput {
-      width: 70%; /* 입력창 비율 조정 */
+      width: 70%;
       padding: 8px;
       margin: 0 5px 0 0;
       border: 1px solid #ddd;
@@ -53,29 +53,52 @@
       background-color: #45a049;
     }
     h1 {
-      font-size: 18px; /* 모바일에서 적당한 크기 */
+      font-size: 18px;
       margin: 0 0 10px 0;
       text-align: center;
     }
     .bar-container {
-      width: 100%; /* 모바일에서 전체 너비 활용 */
-      max-width: 200px; /* 데스크톱에서 제한 */
+      width: 100%;
+      max-width: 200px;
       margin: 8px 0;
     }
     .bar {
+      position: relative;
       height: 18px;
-      text-align: right;
+      background-color: #e0e0e0; /* 100% 배경 회색 */
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .bar-segment {
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
       color: white;
+      text-align: right;
       padding-right: 5px;
       box-sizing: border-box;
+    }
+    .revisit-bar {
+      position: relative;
+      height: 18px;
+      background-color: #e0e0e0; /* 100% 배경 회색 */
       border-radius: 2px;
+      overflow: hidden;
+    }
+    .revisit-segment {
+      height: 100%;
+      position: absolute;
+      top: 0;
+      color: white;
+      text-align: right;
+      padding-right: 5px;
+      box-sizing: border-box;
     }
     .bar-label {
       font-size: 12px;
       margin-bottom: 2px;
     }
-
-    /* 모바일 화면 크기 조정 */
     @media (max-width: 600px) {
       .controls {
         top: 5px;
@@ -94,9 +117,9 @@
         font-size: 16px;
       }
       .bar-container {
-        max-width: 100%; /* 모바일에서 더 넓게 */
+        max-width: 100%;
       }
-      .bar {
+      .bar, .revisit-bar, .bar-segment, .revisit-segment {
         height: 16px;
       }
       .bar-label {
@@ -117,11 +140,11 @@
   <script>
     let map;
     let restaurants = [
-      { name: "고기집", lat: 37.5172, lng: 127.0473, likeProbability: 92, revisitIntent: 90, revisitRate: 80 },
-      { name: "파스타 맛집", lat: 37.5200, lng: 127.0450, likeProbability: 87, revisitIntent: 85, revisitRate: 70 },
-      { name: "카페 드림", lat: 37.5150, lng: 127.0500, likeProbability: 94, revisitIntent: 95, revisitRate: 85 },
-      { name: "분식 천국", lat: 37.5180, lng: 127.0400, likeProbability: 82, revisitIntent: 80, revisitRate: 65 },
-      { name: "초밥 왕", lat: 37.5140, lng: 127.0480, likeProbability: 89, revisitIntent: 88, revisitRate: 75 },
+      { name: "고기집", lat: 37.5172, lng: 127.0473, likeProbability: 92, revisitIntent: 90, revisitRate: { "1": 30, "2": 30, "3+": 20 } },
+      { name: "파스타 맛집", lat: 37.5200, lng: 127.0450, likeProbability: 87, revisitIntent: 85, revisitRate: { "1": 30, "2": 20, "3+": 20 } },
+      { name: "카페 드림", lat: 37.5150, lng: 127.0500, likeProbability: 94, revisitIntent: 95, revisitRate: { "1": 25, "2": 30, "3+": 30 } },
+      { name: "분식 천국", lat: 37.5180, lng: 127.0400, likeProbability: 82, revisitIntent: 80, revisitRate: { "1": 35, "2": 20, "3+": 10 } },
+      { name: "초밥 왕", lat: 37.5140, lng: 127.0480, likeProbability: 89, revisitIntent: 88, revisitRate: { "1": 30, "2": 25, "3+": 20 } },
     ];
 
     function initMap() {
@@ -162,8 +185,9 @@
       });
 
       restaurants.forEach(restaurant => {
-        const markerColor = restaurant.revisitRate >= 80 ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png" :
-                          restaurant.revisitRate <= 60 ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png" :
+        const totalRevisitRate = restaurant.revisitRate["1"] + restaurant.revisitRate["2"] + restaurant.revisitRate["3+"];
+        const markerColor = totalRevisitRate >= 80 ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png" :
+                          totalRevisitRate <= 60 ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png" :
                           "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
         const marker = new google.maps.Marker({
           position: { lat: restaurant.lat, lng: restaurant.lng },
@@ -176,18 +200,30 @@
         const content = `
           <div>
             <b>${restaurant.name}</b><br>
-            <div class="bar-container">
-              <div class="bar-label">좋아할 확률 (${restaurant.likeProbability}%)</div>
-              <div class="bar" style="width: ${restaurant.likeProbability}%; background-color: #FF5722;">${restaurant.likeProbability}%</div>
-            </div>
+            
             <div class="bar-container">
               <div class="bar-label">재방문 의사 (${restaurant.revisitIntent}%)</div>
-              <div class="bar" style="width: ${restaurant.revisitIntent}%; background-color: #4CAF50;">${restaurant.revisitIntent}%</div>
+              <div class="bar">
+                <div class="bar-segment" style="width: ${restaurant.revisitIntent}%; background-color: #4CAF50;">${restaurant.revisitIntent}%</div>
+              </div>
             </div>
+
             <div class="bar-container">
-              <div class="bar-label">재방문율 (${restaurant.revisitRate}%)</div>
-              <div class="bar" style="width: ${restaurant.revisitRate}%; background-color: #2196F3;">${restaurant.revisitRate}%</div>
+              <div class="bar-label">재방문율 (총 ${totalRevisitRate}%)</div>
+              <div class="revisit-bar">
+                <div class="revisit-segment" style="width: ${restaurant.revisitRate["1"]}%; left: 0; background-color: #2196F3;">${restaurant.revisitRate["1"]}%</div>
+                <div class="revisit-segment" style="width: ${restaurant.revisitRate["2"]}%; left: ${restaurant.revisitRate["1"]}%; background-color: #1976D2;">${restaurant.revisitRate["2"]}%</div>
+                <div class="revisit-segment" style="width: ${restaurant.revisitRate["3+"]}%; left: ${restaurant.revisitRate["1"] + restaurant.revisitRate["2"]}%; background-color: #0D47A1;">${restaurant.revisitRate["3+"]}%</div>
+              </div>
             </div>
+
+            <div class="bar-container">
+              <div class="bar-label">좋아할 확률 (${restaurant.likeProbability}%)</div>
+              <div class="bar">
+                <div class="bar-segment" style="width: ${restaurant.likeProbability}%; background-color: #FF5722;">${restaurant.likeProbability}%</div>
+              </div>
+            </div>
+
             <div>
               <label>재방문 의사:</label>
               <select id="revisitIntent_${restaurant.name}" onchange="updateRevisit(this, '${restaurant.name}')">
