@@ -107,7 +107,7 @@
 </head>
 <body>
     <div class="controls">
-      <h1>내 맛집 추천</h1>
+      <h1>맛집 추천</h1>
       <input type="text" id="searchInput" placeholder="식당 이름 검색">
       <button onclick="searchRestaurant()">검색</button>
     </div>
@@ -191,6 +191,7 @@
             <div>
               <label>재방문 의사:</label>
               <select id="revisitIntent_${restaurant.name}" onchange="updateRevisit(this, '${restaurant.name}')">
+                <option value="아직방문안함">아직방문안함</option>
                 <option value="X">X</option>
                 <option value="O">O</option>
               </select>
@@ -198,6 +199,7 @@
             <div id="revisitCount_${restaurant.name}" style="display: none;">
               <label>재방문 횟수:</label>
               <select id="revisitCountSelect_${restaurant.name}">
+                <option value="0">0</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3+">3+</option>
