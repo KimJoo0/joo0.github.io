@@ -209,7 +209,7 @@
             </div>
 
             <div class="bar-container">
-              <div class="bar-label">재방문율 (총 ${totalRevisitRate}%)</div>
+              <div class="bar-label">재방문율(1,2,3+) (총 ${totalRevisitRate}%)</div>
               <div class="revisit-bar">
                 <div class="revisit-segment" style="width: ${restaurant.revisitRate["1"]}%; left: 0; background-color: #2196F3;">${restaurant.revisitRate["1"]}%</div>
                 <div class="revisit-segment" style="width: ${restaurant.revisitRate["2"]}%; left: ${restaurant.revisitRate["1"]}%; background-color: #1976D2;">${restaurant.revisitRate["2"]}%</div>
@@ -218,7 +218,7 @@
             </div>
 
             <div class="bar-container">
-              <div class="bar-label">좋아할 확률 (${restaurant.likeProbability}%)</div>
+              <div class="bar-label">내가 좋아할 확률 (${restaurant.likeProbability}%)</div>
               <div class="bar">
                 <div class="bar-segment" style="width: ${restaurant.likeProbability}%; background-color: #FF5722;">${restaurant.likeProbability}%</div>
               </div>
