@@ -1,9 +1,31 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>내 첫 웹페이지</title>
-    </head>
-    <body>
-        <h1>Hello, World!</h1>
-    </body>
+<head>
+  <title>내 맛집 웹사이트</title>
+  <style>
+    #map { height: 400px; width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>내 맛집 추천</h1>
+  <div id="map"></div>
+  <p>식당 이름: 맛집 예시</p>
+  <p>재방문의사: 90% | 재방문율: 75%</p>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2cf3YWzGrwU9WXlKGVVLFi73cnZ99Cd0&callback=initMap" async defer></script>
+  <script>
+    function initMap() {
+      const location = { lat: 37.5665, lng: 126.9780 }; // 서울 좌표 예시
+      const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 15,
+        center: location,
+      });
+      const marker = new google.maps.Marker({
+        position: location,
+        map: map,
+        title: "맛집 예시",
+      });
+    }
+  </script>
+</body>
 </html>
