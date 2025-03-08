@@ -3,14 +3,12 @@
 <head>
   <title>맛집 추천</title>
   <style>
-    /* HTML과 body를 전체 크기로 설정 */
     html, body {
       height: 100%;
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
     }
-    /* 지도 컨테이너를 전체 화면으로 */
     #map {
       height: 100%;
       width: 100%;
@@ -18,7 +16,6 @@
       top: 0;
       left: 0;
     }
-    /* 검색창과 버튼을 지도 위에 겹치도록 설정 */
     .controls {
       position: absolute;
       top: 10px;
@@ -34,11 +31,26 @@
       margin: 0 5px;
       padding: 5px;
     }
+    .bar-container {
+      width: 200px;
+      margin: 10px 0;
+    }
+    .bar {
+      height: 20px;
+      text-align: right;
+      color: white;
+      padding-right: 5px;
+      box-sizing: border-box;
+    }
+    .bar-label {
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
   </style>
 </head>
 <body>
     <div class="controls">
-      <h1>맛집 추천</h1>
+      <h1>내 맛집 추천</h1>
       <input type="text" id="searchInput" placeholder="식당 이름 검색">
       <button onclick="searchRestaurant()">검색</button>
     </div>
@@ -48,11 +60,11 @@
   <script>
     let map;
     let restaurants = [
-      { name: "고기집", lat: 37.5172, lng: 127.0473, revisitIntent: 90, revisitRate: 80 },
-      { name: "파스타 맛집", lat: 37.5200, lng: 127.0450, revisitIntent: 85, revisitRate: 70 },
-      { name: "카페 드림", lat: 37.5150, lng: 127.0500, revisitIntent: 95, revisitRate: 85 },
-      { name: "분식 천국", lat: 37.5180, lng: 127.0400, revisitIntent: 80, revisitRate: 65 },
-      { name: "초밥 왕", lat: 37.5140, lng: 127.0480, revisitIntent: 88, revisitRate: 75 },
+      { name: "고기집", lat: 37.5172, lng: 127.0473, likeProbability: 92, revisitIntent: 90, revisitRate: 80 },
+      { name: "파스타 맛집", lat: 37.5200, lng: 127.0450, likeProbability: 87, revisitIntent: 85, revisitRate: 70 },
+      { name: "카페 드림", lat: 37.5150, lng: 127.0500, likeProbability: 94, revisitIntent: 95, revisitRate: 85 },
+      { name: "분식 천국", lat: 37.5180, lng: 127.0400, likeProbability: 82, revisitIntent: 80, revisitRate: 65 },
+      { name: "초밥 왕", lat: 37.5140, lng: 127.0480, likeProbability: 89, revisitIntent: 88, revisitRate: 75 },
     ];
 
     function initMap() {
@@ -102,11 +114,54 @@
           title: restaurant.name,
           icon: markerColor,
         });
-        const infoWindow = new google.maps.InfoWindow({
-          content: `<b>${restaurant.name}</b><br>재방문의사: ${restaurant.revisitIntent}%<br>재방문율: ${restaurant.revisitRate}%`,
-        });
+
+        const infoWindow = new google.maps.InfoWindow();
+        const content = `
+          <div>
+            <b>${restaurant.name}</b><br>
+            <div class="bar-container">
+              <div class="bar-label">좋아할 확률 (${restaurant.likeProbability}%)</div>
+              <div class="bar" style="width: ${restaurant.likeProbability}%; background-color: #FF5722;">${restaurant.likeProbability}%</div>
+            </div>
+            <div class="bar-container">
+              <div class="bar-label">재방문 의사 (${restaurant.revisitIntent}%)</div>
+              <div class="bar" style="width: ${restaurant.revisitIntent}%; background-color: #4CAF50;">${restaurant.revisitIntent}%</div>
+            </div>
+            <div class="bar-container">
+              <div class="bar-label">재방문율 (${restaurant.revisitRate}%)</div>
+              <div class="bar" style="width: ${restaurant.revisitRate}%; background-color: #2196F3;">${restaurant.revisitRate}%</div>
+            </div>
+            <div>
+              <label>재방문 의사:</label>
+              <select id="revisitIntent_${restaurant.name}" onchange="updateRevisit(this, '${restaurant.name}')">
+                <option value="아직방문안함">아직방문안함</option>
+                <option value="X">X</option>
+                <option value="O">O</option>
+              </select>
+            </div>
+            <div id="revisitCount_${restaurant.name}" style="display: none;">
+              <label>재방문 횟수:</label>
+              <select id="revisitCountSelect_${restaurant.name}">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3+">3+</option>
+              </select>
+            </div>
+          </div>
+        `;
+        infoWindow.setContent(content);
         marker.addListener("click", () => infoWindow.open(map, marker));
       });
+    }
+
+    function updateRevisit(select, restaurantName) {
+      const revisitCountDiv = document.getElementById(`revisitCount_${restaurantName}`);
+      if (select.value === "O") {
+        revisitCountDiv.style.display = "block";
+      } else {
+        revisitCountDiv.style.display = "none";
+      }
     }
 
     function searchRestaurant() {
