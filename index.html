@@ -2,12 +2,14 @@
 <html>
 <head>
   <title>맛집 추천</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 모바일 반응형을 위한 뷰포트 설정 -->
   <style>
     html, body {
       height: 100%;
       margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
+      overflow: hidden; /* 모바일에서 불필요한 스크롤 방지 */
     }
     #map {
       height: 100%;
@@ -23,28 +25,83 @@
       transform: translateX(-50%);
       z-index: 1;
       background: white;
-      padding: 5px;
-      border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      width: 90%; /* 모바일에서 너무 좁지 않게 */
+      max-width: 400px; /* 데스크톱에서 너무 넓지 않게 */
+      box-sizing: border-box;
     }
     #searchInput {
-      margin: 0 5px;
-      padding: 5px;
+      width: 70%; /* 입력창 비율 조정 */
+      padding: 8px;
+      margin: 0 5px 0 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    button {
+      padding: 8px 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    h1 {
+      font-size: 18px; /* 모바일에서 적당한 크기 */
+      margin: 0 0 10px 0;
+      text-align: center;
     }
     .bar-container {
-      width: 200px;
-      margin: 10px 0;
+      width: 100%; /* 모바일에서 전체 너비 활용 */
+      max-width: 200px; /* 데스크톱에서 제한 */
+      margin: 8px 0;
     }
     .bar {
-      height: 20px;
+      height: 18px;
       text-align: right;
       color: white;
       padding-right: 5px;
       box-sizing: border-box;
+      border-radius: 2px;
     }
     .bar-label {
       font-size: 12px;
       margin-bottom: 2px;
+    }
+
+    /* 모바일 화면 크기 조정 */
+    @media (max-width: 600px) {
+      .controls {
+        top: 5px;
+        padding: 8px;
+      }
+      #searchInput {
+        width: 65%;
+        font-size: 12px;
+        padding: 6px;
+      }
+      button {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+      h1 {
+        font-size: 16px;
+      }
+      .bar-container {
+        max-width: 100%; /* 모바일에서 더 넓게 */
+      }
+      .bar {
+        height: 16px;
+      }
+      .bar-label {
+        font-size: 11px;
+      }
     }
   </style>
 </head>
@@ -134,7 +191,6 @@
             <div>
               <label>재방문 의사:</label>
               <select id="revisitIntent_${restaurant.name}" onchange="updateRevisit(this, '${restaurant.name}')">
-                <option value="아직방문안함">아직방문안함</option>
                 <option value="X">X</option>
                 <option value="O">O</option>
               </select>
@@ -142,7 +198,6 @@
             <div id="revisitCount_${restaurant.name}" style="display: none;">
               <label>재방문 횟수:</label>
               <select id="revisitCountSelect_${restaurant.name}">
-                <option value="0">0</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3+">3+</option>
