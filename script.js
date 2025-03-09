@@ -1,10 +1,10 @@
 // 카카오 SDK가 로드되었는지 확인하는 함수
 function waitForKakao() {
     if (typeof kakao === 'undefined' || !kakao.maps) {
-        setTimeout(waitForKakao, 100); // 100ms 후 재확인
+        setTimeout(waitForKakao, 100);
         return;
     }
-    initializeMap(); // SDK 로드 완료 시 초기화
+    initializeMap();
 }
 
 function initializeMap() {
@@ -19,7 +19,7 @@ function initializeMap() {
 
     var map = new kakao.maps.Map(mapContainer, mapOption);
     var ps = new kakao.maps.services.Places();
-    var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+    var infowindow = new kakao.maps.InfoWindow({zIndex: 100}); // zIndex를 100으로 높임
 
     var searchForm = document.getElementById('searchForm');
     searchForm.addEventListener('submit', function(e) {
@@ -30,9 +30,6 @@ function initializeMap() {
     window.addEventListener('resize', function() {
         map.relayout();
     });
-
-    // 초기 검색 실행
-    searchPlaces();
 
     function searchPlaces() {
         var keyword = document.getElementById('keyword').value;
@@ -188,85 +185,98 @@ function initializeMap() {
         
         const totalRevisitRate = Object.values(placeData.revisitRate).reduce((a, b) => a + b, 0);
 
-        const content = `
-            <div class="infowindow-content">
-                <b>${placeData.name}</b><br>
-                <div class="select-group">
-                    <label>나이:</label>
-                    <select id="ageSelect_${placeData.name}" onchange="updateStats('${placeData.name}')">
-                        <option value="전체">전체</option>
-                        <option value="10대">10대</option>
-                        <option value="20대">20대</option>
-                        <option value="30대">30대</option>
-                        <option value="40대">40대</option>
-                        <option value="50대">50대</option>
-                        <option value="60+">60+</option>
-                    </select>
-                    <label>성별:</label>
-                    <select id="genderSelect_${placeData.name}" onchange="updateStats('${placeData.name}')">
-                        <option value="전체">전체</option>
-                        <option value="남자">남자</option>
-                        <option value="여자">여자</option>
-                    </select>
-                </div>
-                <div class="bar-container">
-                    <div class="bar-label">재방문 의사 (${placeData.revisitIntent}%)</div>
-                    <div class="bar">
-                        <div class="bar-segment revisit-intent" style="width: ${placeData.revisitIntent}%;">
-                            ${placeData.revisitIntent}%
-                        </div>
+        const content = document.createElement('div');
+        content.className = 'infowindow-content';
+        content.innerHTML = `
+            <b>${placeData.name}</b><br>
+            <div class="select-group">
+                <label>나이:</label>
+                <select id="ageSelect_${placeData.name}" onchange="updateStats('${placeData.name}')">
+                    <option value="전체">전체</option>
+                    <option value="10대">10대</option>
+                    <option value="20대">20대</option>
+                    <option value="30대">30대</option>
+                    <option value="40대">40대</option>
+                    <option value="50대">50대</option>
+                    <option value="60+">60+</option>
+                </select>
+                <label>성별:</label>
+                <select id="genderSelect_${placeData.name}" onchange="updateStats('${placeData.name}')">
+                    <option value="전체">전체</option>
+                    <option value="남자">남자</option>
+                    <option value="여자">여자</option>
+                </select>
+            </div>
+            <div class="bar-container">
+                <div class="bar-label">재방문 의사 (${placeData.revisitIntent}%)</div>
+                <div class="bar">
+                    <div class="bar-segment revisit-intent" style="width: ${placeData.revisitIntent}%;">
+                        ${placeData.revisitIntent}%
                     </div>
-                </div>
-                <div class="bar-container">
-                    <div class="bar-label">재방문율(1,2,3+) (총 ${totalRevisitRate}%)</div>
-                    <div class="revisit-bar">
-                        <div class="revisit-segment revisit-1" style="width: ${placeData.revisitRate["1"]}%; left: 0;">
-                            ${placeData.revisitRate["1"]}%
-                        </div>
-                        <div class="revisit-segment revisit-2" style="width: ${placeData.revisitRate["2"]}%; left: ${placeData.revisitRate["1"]}%;">
-                            ${placeData.revisitRate["2"]}%
-                        </div>
-                        <div class="revisit-segment revisit-3" style="width: ${placeData.revisitRate["3+"]}%; left: ${placeData.revisitRate["1"] + placeData.revisitRate["2"]}%;">
-                            ${placeData.revisitRate["3+"]}%
-                        </div>
-                    </div>
-                </div>
-                <div class="bar-container">
-                    <div class="bar-label">내가 좋아할 확률 (${placeData.likeProbability}%)</div>
-                    <div class="bar">
-                        <div class="bar-segment like-probability" style="width: ${placeData.likeProbability}%;">
-                            ${placeData.likeProbability}%
-                        </div>
-                    </div>
-                </div>
-                <div class="revisit-section">
-                    <label>재방문 의사:</label>
-                    <select id="revisitIntent_${placeData.name}" class="revisit-intent-select">
-                        <option value="아직방문안함">아직방문안함</option>
-                        <option value="X">X</option>
-                        <option value="O">O</option>
-                    </select>
-                </div>
-                <div id="revisitCount_${placeData.name}" class="revisit-count-section">
-                    <label>재방문 횟수:</label>
-                    <select id="revisitCountSelect_${placeData.name}" class="revisit-count-select">
-                        <option value="0">0</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3+">3+</option>
-                    </select>
                 </div>
             </div>
+            <div class="bar-container">
+                <div class="bar-label">재방문율(1,2,3+) (총 ${totalRevisitRate}%)</div>
+                <div class="revisit-bar">
+                    <div class="revisit-segment revisit-1" style="width: ${placeData.revisitRate["1"]}%; left: 0;">
+                        ${placeData.revisitRate["1"]}%
+                    </div>
+                    <div class="revisit-segment revisit-2" style="width: ${placeData.revisitRate["2"]}%; left: ${placeData.revisitRate["1"]}%;">
+                        ${placeData.revisitRate["2"]}%
+                    </div>
+                    <div class="revisit-segment revisit-3" style="width: ${placeData.revisitRate["3+"]}%; left: ${placeData.revisitRate["1"] + placeData.revisitRate["2"]}%;">
+                        ${placeData.revisitRate["3+"]}%
+                    </div>
+                </div>
+            </div>
+            <div class="bar-container">
+                <div class="bar-label">내가 좋아할 확률 (${placeData.likeProbability}%)</div>
+                <div class="bar">
+                    <div class="bar-segment like-probability" style="width: ${placeData.likeProbability}%;">
+                        ${placeData.likeProbability}%
+                    </div>
+                </div>
+            </div>
+            <div class="revisit-section">
+                <label>재방문 의사:</label>
+                <select id="revisitIntent_${placeData.name}" class="revisit-intent-select">
+                    <option value="아직방문안함">아직방문안함</option>
+                    <option value="X">X</option>
+                    <option value="O">O</option>
+                </select>
+            </div>
+            <div id="revisitCount_${placeData.name}" class="revisit-count-section">
+                <label>재방문 횟수:</label>
+                <select id="revisitCountSelect_${placeData.name}" class="revisit-count-select">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3+">3+</option>
+                </select>
+            </div>
         `;
+
+        content.addEventListener('click', function(e) {
+            if (e.target.tagName !== 'SELECT' && e.target.tagName !== 'OPTION') {
+                infowindow.close();
+                currentMarker = null;
+            }
+        });
 
         infowindow.setContent(content);
         infowindow.open(map, marker);
 
-        // 동적으로 생성된 요소에 이벤트 리스너 추가
+        // 인포윈도우의 상위 요소 z-index 강제 조정 (필요 시)
+        setTimeout(() => {
+            const infoWrapper = content.parentElement;
+            if (infoWrapper) {
+                infoWrapper.style.zIndex = '100';
+            }
+        }, 0);
+
         const revisitIntentSelect = document.getElementById(`revisitIntent_${placeData.name}`);
         const revisitCountSection = document.getElementById(`revisitCount_${placeData.name}`);
 
-        // 초기 상태 설정
         revisitCountSection.style.display = revisitIntentSelect.value === "O" ? "block" : "none";
 
         revisitIntentSelect.addEventListener('change', function() {
@@ -277,7 +287,7 @@ function initializeMap() {
                 revisitCountSection.classList.remove('visible');
                 setTimeout(() => {
                     revisitCountSection.style.display = "none";
-                }, 300); // 애니메이션 시간과 맞춤
+                }, 300);
             }
             console.log(`${placeData.name}의 재방문 의사: ${this.value}`);
         });
