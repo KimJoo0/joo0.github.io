@@ -1,301 +1,385 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>맛집 추천</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-    }
-    #map {
-      height: 100%;
-      width: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-    .controls {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 1;
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      width: 90%;
-      max-width: 400px;
-      box-sizing: border-box;
-    }
-    #searchInput {
-      width: 70%;
-      padding: 8px;
-      margin: 0 5px 0 0;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    button {
-      padding: 8px 12px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    h1 {
-      font-size: 18px;
-      margin: 0 0 10px 0;
-      text-align: center;
-    }
-    .bar-container {
-      width: 100%;
-      max-width: 200px;
-      margin: 8px 0;
-    }
-    .bar {
-      position: relative;
-      height: 18px;
-      background-color: #e0e0e0; /* 100% 배경 회색 */
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .bar-segment {
-      height: 100%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      color: white;
-      text-align: right;
-      padding-right: 5px;
-      box-sizing: border-box;
-    }
-    .revisit-bar {
-      position: relative;
-      height: 18px;
-      background-color: #e0e0e0; /* 100% 배경 회색 */
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .revisit-segment {
-      height: 100%;
-      position: absolute;
-      top: 0;
-      color: white;
-      text-align: right;
-      padding-right: 5px;
-      box-sizing: border-box;
-    }
-    .bar-label {
-      font-size: 12px;
-      margin-bottom: 2px;
-    }
-    @media (max-width: 600px) {
-      .controls {
-        top: 5px;
-        padding: 8px;
-      }
-      #searchInput {
-        width: 65%;
-        font-size: 12px;
-        padding: 6px;
-      }
-      button {
-        font-size: 12px;
-        padding: 6px 10px;
-      }
-      h1 {
-        font-size: 16px;
-      }
-      .bar-container {
-        max-width: 100%;
-      }
-      .bar, .revisit-bar, .bar-segment, .revisit-segment {
-        height: 16px;
-      }
-      .bar-label {
-        font-size: 11px;
-      }
-    }
-  </style>
+    <meta charset="utf-8">
+    <title>키워드로 장소검색하고 목록으로 표출하기</title>
+    <style>
+.map_wrap, .map_wrap * {margin:0;padding:0;font-family:'Malgun Gothic',dotum,'돋움',sans-serif;font-size:12px;}
+.map_wrap a, .map_wrap a:hover, .map_wrap a:active{color:#000;text-decoration: none;}
+.map_wrap {position:relative;width:100%;height:500px;}
+#menu_wrap {position:absolute;top:0;left:0;bottom:0;width:250px;margin:10px 0 30px 10px;padding:5px;overflow-y:auto;background:rgba(255, 255, 255, 0.7);z-index: 1;font-size:12px;border-radius: 10px;}
+.bg_white {background:#fff;}
+#menu_wrap hr {display: block; height: 1px;border: 0; border-top: 2px solid #5F5F5F;margin:3px 0;}
+#menu_wrap .option{text-align: center;}
+#menu_wrap .option p {margin:10px 0;}  
+#menu_wrap .option button {margin-left:5px;}
+#placesList li {list-style: none;}
+#placesList .item {position:relative;border-bottom:1px solid #888;overflow: hidden;cursor: pointer;min-height: 65px;}
+#placesList .item span {display: block;margin-top:4px;}
+#placesList .item h5, #placesList .item .info {text-overflow: ellipsis;overflow: hidden;white-space: nowrap;}
+#placesList .item .info{padding:10px 0 10px 55px;}
+#placesList .info .gray {color:#8a8a8a;}
+#placesList .info .jibun {padding-left:26px;background:url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_jibun.png) no-repeat;}
+#placesList .info .tel {color:#009900;}
+#placesList .item .markerbg {float:left;position:absolute;width:36px; height:37px;margin:10px 0 0 10px;background:url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png) no-repeat;}
+#placesList .item .marker_1 {background-position: 0 -10px;}
+#placesList .item .marker_2 {background-position: 0 -56px;}
+#placesList .item .marker_3 {background-position: 0 -102px}
+#placesList .item .marker_4 {background-position: 0 -148px;}
+#placesList .item .marker_5 {background-position: 0 -194px;}
+#placesList .item .marker_6 {background-position: 0 -240px;}
+#placesList .item .marker_7 {background-position: 0 -286px;}
+#placesList .item .marker_8 {background-position: 0 -332px;}
+#placesList .item .marker_9 {background-position: 0 -378px;}
+#placesList .item .marker_10 {background-position: 0 -423px;}
+#placesList .item .marker_11 {background-position: 0 -470px;}
+#placesList .item .marker_12 {background-position: 0 -516px;}
+#placesList .item .marker_13 {background-position: 0 -562px;}
+#placesList .item .marker_14 {background-position: 0 -608px;}
+#placesList .item .marker_15 {background-position: 0 -654px;}
+#pagination {margin:10px auto;text-align: center;}
+#pagination a {display:inline-block;margin-right:10px;}
+#pagination .on {font-weight: bold; cursor: default;color:#777;}
+.bar-container { margin: 10px 0; }
+.bar-label { font-size: 12px; margin-bottom: 5px; }
+.bar { width: 200px; height: 20px; background: #eee; position: relative; }
+.bar-segment { height: 100%; color: white; text-align: center; line-height: 20px; }
+.revisit-bar { width: 200px; height: 20px; background: #eee; position: relative; }
+.revisit-segment { height: 100%; position: absolute; color: white; text-align: center; line-height: 20px; }
+select { margin: 5px; }
+</style>
 </head>
 <body>
-    <div class="controls">
-      <h1>맛집 추천</h1>
-      <input type="text" id="searchInput" placeholder="식당 이름 검색">
-      <button onclick="searchRestaurant()">검색</button>
+<div class="map_wrap">
+    <div id="map" style="width:100%;height:100%;position:relative;overflow:hidden;"></div>
+
+    <div id="menu_wrap" class="bg_white">
+        <div class="option">
+            <div>
+                <form onsubmit="searchPlaces(); return false;">
+                    키워드 : <input type="text" value="이태원 맛집" id="keyword" size="15"> 
+                    <button type="submit">검색하기</button> 
+                </form>
+            </div>
+        </div>
+        <hr>
+        <ul id="placesList"></ul>
+        <div id="pagination"></div>
     </div>
-    <div id="map"></div>
+</div>
 
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB2cf3YWzGrwU9WXlKGVVLFi73cnZ99Cd0&callback=initMap" async defer></script>
-  <script>
-    let map;
-    let restaurants = [
-      { name: "고기집", 
-      lat: 37.5172, lng: 127.0473, 
-      likeProbability: 92, revisitIntent: 90, revisitRate: { "1": 30, "2": 30, "3+": 20 } },
-      { name: "파스타 맛집", lat: 37.5200, lng: 127.0450, likeProbability: 87, revisitIntent: 85, revisitRate: { "1": 30, "2": 20, "3+": 20 } },
-      { name: "카페 드림", lat: 37.5150, lng: 127.0500, likeProbability: 94, revisitIntent: 95, revisitRate: { "1": 25, "2": 30, "3+": 30 } },
-      { name: "분식 천국", lat: 37.5180, lng: 127.0400, likeProbability: 82, revisitIntent: 80, revisitRate: { "1": 35, "2": 20, "3+": 10 } },
-      { name: "초밥 왕", lat: 37.5140, lng: 127.0480, likeProbability: 89, revisitIntent: 88, revisitRate: { "1": 30, "2": 25, "3+": 20 } },
-    ];
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a516d14907278badec077745b1651dc8&libraries=services"></script>
+<script>
+// 마커를 담을 배열입니다
+var markers = [];
+var currentMarker = null; // 현재 열려있는 마커를 추적
 
-    function initMap() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const userLocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            setupMap(userLocation);
-          },
-          (error) => {
-            console.error("위치 정보를 가져오지 못했습니다:", error);
-            const defaultLocation = { lat: 37.5172, lng: 127.0473 };
-            setupMap(defaultLocation);
-            alert("위치 정보를 가져오지 못해 강남역을 기본 위치로 설정했습니다.");
-          }
-        );
-      } else {
-        const defaultLocation = { lat: 37.5172, lng: 127.0473 };
-        setupMap(defaultLocation);
-        alert("이 브라우저는 위치 정보를 지원하지 않습니다. 강남역을 기본 위치로 설정했습니다.");
-      }
+var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+    mapOption = {
+        center: new kakao.maps.LatLng(37.566826, 126.9786567), // 지도의 중심좌표
+        level: 3 // 지도의 확대 레벨
+    };  
+
+// 지도를 생성합니다    
+var map = new kakao.maps.Map(mapContainer, mapOption); 
+
+// 장소 검색 객체를 생성합니다
+var ps = new kakao.maps.services.Places();  
+
+// 검색 결과 목록이나 마커를 클릭했을 때 장소명을 표출할 인포윈도우를 생성합니다
+var infowindow = new kakao.maps.InfoWindow({zIndex:1});
+
+// 키워드로 장소를 검색합니다
+searchPlaces();
+
+// 키워드 검색을 요청하는 함수입니다
+function searchPlaces() {
+    var keyword = document.getElementById('keyword').value;
+
+    if (!keyword.replace(/^\s+|\s+$/g, '')) {
+        alert('키워드를 입력해주세요!');
+        return false;
     }
 
-    function setupMap(center) {
-      map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 14,
-        center: center,
-      });
+    // 장소검색 객체를 통해 키워드로 장소검색을 요청합니다
+    ps.keywordSearch(keyword, placesSearchCB); 
+}
 
-      new google.maps.Marker({
-        position: center,
-        map: map,
-        title: "내 위치",
-        icon: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-      });
+// 장소검색이 완료됐을 때 호출되는 콜백함수 입니다
+function placesSearchCB(data, status, pagination) {
+    if (status === kakao.maps.services.Status.OK) {
+        // 정상적으로 검색이 완료됐으면 검색 목록과 마커를 표출합니다
+        displayPlaces(data);
+        // 페이지 번호를 표출합니다
+        displayPagination(pagination);
+    } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+        alert('검색 결과가 존재하지 않습니다.');
+        return;
+    } else if (status === kakao.maps.services.Status.ERROR) {
+        alert('검색 결과 중 오류가 발생했습니다.');
+        return;
+    }
+}
 
-      restaurants.forEach(restaurant => {
-        const totalRevisitRate = restaurant.revisitRate["1"] + restaurant.revisitRate["2"] + restaurant.revisitRate["3+"];
-        const markerColor = totalRevisitRate >= 80 ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png" :
-                          totalRevisitRate <= 60 ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png" :
-                          "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
-        const marker = new google.maps.Marker({
-          position: { lat: restaurant.lat, lng: restaurant.lng },
-          map: map,
-          title: restaurant.name,
-          icon: markerColor,
+// 검색 결과 목록과 마커를 표출하는 함수입니다
+function displayPlaces(places) {
+    var listEl = document.getElementById('placesList'), 
+        menuEl = document.getElementById('menu_wrap'),
+        fragment = document.createDocumentFragment(), 
+        bounds = new kakao.maps.LatLngBounds(), 
+        listStr = '';
+    
+    // 검색 결과 목록에 추가된 항목들을 제거합니다
+    removeAllChildNods(listEl);
+
+    // 지도에 표시되고 있는 마커를 제거합니다
+    removeMarker();
+    
+    for (var i = 0; i < places.length; i++) {
+        // 마커를 생성하고 지도에 표시합니다
+        var placePosition = new kakao.maps.LatLng(places[i].y, places[i].x),
+            marker = addMarker(placePosition, i), 
+            itemEl = getListItem(i, places[i]); // 검색 결과 항목 Element를 생성합니다
+
+        // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
+        bounds.extend(placePosition);
+
+        // 마커와 검색결과 항목에 클릭 이벤트 추가
+        (function(marker, place) {
+            kakao.maps.event.addListener(marker, 'click', function() {
+                if (currentMarker === marker) {
+                    // 이미 열려있는 마커를 다시 클릭하면 닫음
+                    infowindow.close();
+                    currentMarker = null;
+                } else {
+                    // 다른 마커를 클릭하면 기존 인포윈도우 닫고 새로 열음
+                    infowindow.close();
+                    displayInfowindow(marker, place);
+                    currentMarker = marker;
+                }
+            });
+
+            itemEl.onclick = function() {
+                if (currentMarker === marker) {
+                    infowindow.close();
+                    currentMarker = null;
+                } else {
+                    infowindow.close();
+                    displayInfowindow(marker, place);
+                    currentMarker = marker;
+                }
+            };
+        })(marker, places[i]);
+
+        fragment.appendChild(itemEl);
+    }
+
+    // 검색결과 항목들을 검색결과 목록 Element에 추가합니다
+    listEl.appendChild(fragment);
+    menuEl.scrollTop = 0;
+
+    // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
+    map.setBounds(bounds);
+}
+
+// 검색결과 항목을 Element로 반환하는 함수입니다
+function getListItem(index, places) {
+    var el = document.createElement('li'),
+    itemStr = '<span class="markerbg marker_' + (index+1) + '"></span>' +
+                '<div class="info">' +
+                '   <h5>' + places.place_name + '</h5>';
+
+    if (places.road_address_name) {
+        itemStr += '    <span>' + places.road_address_name + '</span>' +
+                    '   <span class="jibun gray">' +  places.address_name  + '</span>';
+    } else {
+        itemStr += '    <span>' +  places.address_name  + '</span>'; 
+    }
+                 
+    itemStr += '  <span class="tel">' + places.phone  + '</span>' +
+                '</div>';           
+
+    el.innerHTML = itemStr;
+    el.className = 'item';
+
+    return el;
+}
+
+// 마커를 생성하고 지도 위에 마커를 표시하는 함수입니다
+function addMarker(position, idx, title) {
+    var imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png', 
+        imageSize = new kakao.maps.Size(36, 37),  
+        imgOptions =  {
+            spriteSize : new kakao.maps.Size(36, 691), 
+            spriteOrigin : new kakao.maps.Point(0, (idx*46)+10), 
+            offset: new kakao.maps.Point(13, 37) 
+        },
+        markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions),
+        marker = new kakao.maps.Marker({
+            position: position, 
+            image: markerImage 
         });
 
-        const infoWindow = new google.maps.InfoWindow();
-        const content = `
-          <div>
-            <b>${restaurant.name}</b><br>
-            
-            <div>
-              <label>나이:</label>
-              <select id="ageSelect_${restaurant.name}" onchange="updateStats('${restaurant.name}')">
-                <option value="전체">전체</option>
-                <option value="10대">10대</option>
-                <option value="20대">20대</option>
-                <option value="30대">30대</option>
-                <option value="40대">40대</option>
-                <option value="50대">50대</option>
-                <option value="60+">60+</option>
-              </select>
-              <label>성별:</label>
-              <select id="genderSelect_${restaurant.name}" onchange="updateStats('${restaurant.name}')">
-                <option value="전체">전체</option>
-                <option value="남자">남자</option>
-                <option value="여자">여자</option>
-              </select>
-            </div>
+    marker.setMap(map); 
+    markers.push(marker);  
 
+    return marker;
+}
 
+// 지도 위에 표시되고 있는 마커를 모두 제거합니다
+function removeMarker() {
+    for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+    }   
+    markers = [];
+}
 
-            <div class="bar-container">
-              <div class="bar-label">재방문 의사 (${restaurant.revisitIntent}%)</div>
-              <div class="bar">
-                <div class="bar-segment" style="width: ${restaurant.revisitIntent}%; background-color: #4CAF50;">${restaurant.revisitIntent}%</div>
-              </div>
-            </div>
+// 검색결과 목록 하단에 페이지번호를 표시는 함수입니다
+function displayPagination(pagination) {
+    var paginationEl = document.getElementById('pagination'),
+        fragment = document.createDocumentFragment(),
+        i; 
 
-            <div class="bar-container">
-              <div class="bar-label">재방문율(1,2,3+) (총 ${totalRevisitRate}%)</div>
-              <div class="revisit-bar">
-                <div class="revisit-segment" style="width: ${restaurant.revisitRate["1"]}%; left: 0; background-color: #2196F3;">${restaurant.revisitRate["1"]}%</div>
-                <div class="revisit-segment" style="width: ${restaurant.revisitRate["2"]}%; left: ${restaurant.revisitRate["1"]}%; background-color: #1976D2;">${restaurant.revisitRate["2"]}%</div>
-                <div class="revisit-segment" style="width: ${restaurant.revisitRate["3+"]}%; left: ${restaurant.revisitRate["1"] + restaurant.revisitRate["2"]}%; background-color: #0D47A1;">${restaurant.revisitRate["3+"]}%</div>
-              </div>
-            </div>
-
-            <div class="bar-container">
-              <div class="bar-label">내가 좋아할 확률 (${restaurant.likeProbability}%)</div>
-              <div class="bar">
-                <div class="bar-segment" style="width: ${restaurant.likeProbability}%; background-color: #FF5722;">${restaurant.likeProbability}%</div>
-              </div>
-            </div>
-
-            
-            <div>
-              <label>재방문 의사:</label>
-              <select id="revisitIntent_${restaurant.name}" onchange="updateRevisit(this, '${restaurant.name}')">
-                <option value="아직방문안함">아직방문안함</option>
-                <option value="X">X</option>
-                <option value="O">O</option>
-              </select>
-            </div>
-
-            <div id="revisitCount_${restaurant.name}" style="display: none;">
-              <label>재방문 횟수:</label>
-              <select id="revisitCountSelect_${restaurant.name}">
-                <option value="0">0</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3+">3+</option>
-              </select>
-            </div>
-
-
-
-          </div>
-        `;
-        infoWindow.setContent(content);
-        marker.addListener("click", () => infoWindow.open(map, marker));
-      });
+    while (paginationEl.hasChildNodes()) {
+        paginationEl.removeChild(paginationEl.lastChild);
     }
 
-    function updateRevisit(select, restaurantName) {
-      const revisitCountDiv = document.getElementById(`revisitCount_${restaurantName}`);
-      if (select.value === "O") {
+    for (i = 1; i <= pagination.last; i++) {
+        var el = document.createElement('a');
+        el.href = "#";
+        el.innerHTML = i;
+
+        if (i === pagination.current) {
+            el.className = 'on';
+        } else {
+            el.onclick = (function(i) {
+                return function() {
+                    pagination.gotoPage(i);
+                }
+            })(i);
+        }
+
+        fragment.appendChild(el);
+    }
+    paginationEl.appendChild(fragment);
+}
+
+// 인포윈도우를 표시하는 함수입니다
+function displayInfowindow(marker, place) {
+    const placeData = {
+        name: place.place_name,
+        revisitIntent: place.revisitIntent || 70,
+        revisitRate: place.revisitRate || { "1": 30, "2": 20, "3+": 10 },
+        likeProbability: place.likeProbability || 85
+    };
+    
+    const totalRevisitRate = Object.values(placeData.revisitRate).reduce((a, b) => a + b, 0);
+
+    const content = `
+        <div style="padding:5px;z-index:1;width:300px;">
+            <b>${placeData.name}</b><br>
+            
+            <div>
+                <label>나이:</label>
+                <select id="ageSelect_${placeData.name}" onchange="updateStats('${placeData.name}')">
+                    <option value="전체">전체</option>
+                    <option value="10대">10대</option>
+                    <option value="20대">20대</option>
+                    <option value="30대">30대</option>
+                    <option value="40대">40대</option>
+                    <option value="50대">50대</option>
+                    <option value="60+">60+</option>
+                </select>
+                <label>성별:</label>
+                <select id="genderSelect_${placeData.name}" onchange="updateStats('${placeData.name}')">
+                    <option value="전체">전체</option>
+                    <option value="남자">남자</option>
+                    <option value="여자">여자</option>
+                </select>
+            </div>
+
+            <div class="bar-container">
+                <div class="bar-label">재방문 의사 (${placeData.revisitIntent}%)</div>
+                <div class="bar">
+                    <div class="bar-segment" style="width: ${placeData.revisitIntent}%; background-color: #4CAF50;">
+                        ${placeData.revisitIntent}%
+                    </div>
+                </div>
+            </div>
+
+            <div class="bar-container">
+                <div class="bar-label">재방문율(1,2,3+) (총 ${totalRevisitRate}%)</div>
+                <div class="revisit-bar">
+                    <div class="revisit-segment" style="width: ${placeData.revisitRate["1"]}%; left: 0; background-color: #2196F3;">
+                        ${placeData.revisitRate["1"]}%
+                    </div>
+                    <div class="revisit-segment" style="width: ${placeData.revisitRate["2"]}%; left: ${placeData.revisitRate["1"]}%; background-color: #1976D2;">
+                        ${placeData.revisitRate["2"]}%
+                    </div>
+                    <div class="revisit-segment" style="width: ${placeData.revisitRate["3+"]}%; left: ${placeData.revisitRate["1"] + placeData.revisitRate["2"]}%; background-color: #0D47A1;">
+                        ${placeData.revisitRate["3+"]}%
+                    </div>
+                </div>
+            </div>
+
+            <div class="bar-container">
+                <div class="bar-label">내가 좋아할 확률 (${placeData.likeProbability}%)</div>
+                <div class="bar">
+                    <div class="bar-segment" style="width: ${placeData.likeProbability}%; background-color: #FF5722;">
+                        ${placeData.likeProbability}%
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label>재방문 의사:</label>
+                <select id="revisitIntent_${placeData.name}" onchange="updateRevisit(this, '${placeData.name}')">
+                    <option value="아직방문안함">아직방문안함</option>
+                    <option value="X">X</option>
+                    <option value="O">O</option>
+                </select>
+            </div>
+
+            <div id="revisitCount_${placeData.name}" style="display: none;">
+                <label>재방문 횟수:</label>
+                <select id="revisitCountSelect_${placeData.name}">
+                    <option value="0">0</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3+">3+</option>
+                </select>
+            </div>
+        </div>
+    `;
+
+    infowindow.setContent(content);
+    infowindow.open(map, marker);
+}
+
+// 검색결과 목록의 자식 Element를 제거하는 함수입니다
+function removeAllChildNods(el) {   
+    while (el.hasChildNodes()) {
+        el.removeChild(el.lastChild);
+    }
+}
+
+// 통계 업데이트를 위한 placeholder 함수
+function updateStats(placeName) {
+    console.log(`${placeName}에 대한 통계 업데이트 중`);
+    // 나이/성별 선택에 따라 통계를 업데이트하는 로직을 여기에 추가
+}
+
+// 재방문 의사 선택 처리
+function updateRevisit(element, placeName) {
+    const revisitCountDiv = document.getElementById(`revisitCount_${placeName}`);
+    if (element.value === "O") {
         revisitCountDiv.style.display = "block";
-      } else {
+    } else {
         revisitCountDiv.style.display = "none";
-      }
     }
-
-    function searchRestaurant() {
-      const input = document.getElementById("searchInput").value.toLowerCase();
-      const found = restaurants.find(r => r.name.toLowerCase().includes(input));
-      if (found) {
-        map.setCenter({ lat: found.lat, lng: found.lng });
-        map.setZoom(16);
-        alert(`${found.name} 찾았어요!`);
-      } else {
-        alert("검색 결과가 없어요.");
-      }
-    }
-  </script>
+    console.log(`${placeName}의 재방문 의사 업데이트: ${element.value}`);
+    // 재방문 데이터를 저장하거나 업데이트하는 로직을 여기에 추가
+}
+</script>
 </body>
 </html>
