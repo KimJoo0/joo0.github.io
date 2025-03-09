@@ -22,7 +22,12 @@ function initializeMap() {
     var infowindow = new kakao.maps.InfoWindow({zIndex: 20});
 
     var searchForm = document.getElementById('searchForm');
-    var menuWrap = document.getElementById('menu_wrap'); // 검색창 요소 참조
+    var menuWrap = document.getElementById('menu_wrap');
+
+    // 모바일 감지 함수 (768px 이하를 모바일로 간주)
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
 
     searchForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -76,7 +81,9 @@ function initializeMap() {
                     if (currentMarker === marker) {
                         infowindow.close();
                         currentMarker = null;
-                        menuWrap.style.zIndex = '10'; // 인포윈도우 닫힐 때 복구
+                        if (isMobile()) {
+                            menuWrap.style.zIndex = '10'; // 모바일에서만 복구
+                        }
                     } else {
                         infowindow.close();
                         displayInfowindow(marker, place);
@@ -88,7 +95,9 @@ function initializeMap() {
                     if (currentMarker === marker) {
                         infowindow.close();
                         currentMarker = null;
-                        menuWrap.style.zIndex = '10'; // 인포윈도우 닫힐 때 복구
+                        if (isMobile()) {
+                            menuWrap.style.zIndex = '10'; // 모바일에서만 복구
+                        }
                     } else {
                         infowindow.close();
                         displayInfowindow(marker, place);
@@ -260,14 +269,18 @@ function initializeMap() {
             </div>
         `;
 
-        // 인포윈도우 열릴 때 검색창 z-index를 0으로 설정
-        menuWrap.style.zIndex = '0';
+        // 모바일일 때만 검색창 z-index를 0으로 설정
+        if (isMobile()) {
+            menuWrap.style.zIndex = '0';
+        }
 
         content.addEventListener('click', function(e) {
             if (e.target.tagName !== 'SELECT' && e.target.tagName !== 'OPTION') {
                 infowindow.close();
                 currentMarker = null;
-                menuWrap.style.zIndex = '10'; // 인포윈도우 닫힐 때 복구
+                if (isMobile()) {
+                    menuWrap.style.zIndex = '10'; // 모바일에서만 복구
+                }
             }
         });
 
