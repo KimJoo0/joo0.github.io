@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 모바일 반응형을 위한 viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>키워드로 장소검색하고 목록으로 표출하기</title>
     <style>
         html, body {
@@ -39,7 +39,7 @@
             left: 10px;
             width: 250px;
             padding: 5px;
-            background: rgba(255, 255, 255, 0.9); /* 투명도 약간 조정 */
+            background: rgba(255, 255, 255, 0.9); /* 기본 반투명 */
             z-index: 1;
             font-size: 12px;
             border-radius: 10px;
@@ -170,9 +170,9 @@
         }
         /* 데스크톱 기본 스타일 */
         #menu_wrap {
-            bottom: 10px; /* 왼쪽 세로 패널 */
+            bottom: 10px;
             height: auto;
-            max-height: calc(100vh - 20px); /* 상하 여백 고려 */
+            max-height: calc(100vh - 20px);
         }
         /* 모바일 스타일 */
         @media (max-width: 768px) {
@@ -180,18 +180,19 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                width: 100%; /* 가로 전체 */
+                width: 100%;
                 bottom: auto;
-                max-height: 40vh; /* 화면 높이의 40% */
-                border-radius: 0; /* 모바일에서 둥근 모서리 제거 */
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 그림자 추가 */
+                max-height: 40vh;
+                border-radius: 0;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                /* 배경은 기본값인 rgba(255, 255, 255, 0.9)를 유지 */
             }
             #placesList .item {
-                min-height: 50px; /* 모바일에서 항목 높이 줄임 */
+                min-height: 50px;
             }
             #map {
-                top: 40vh; /* 메뉴 아래부터 지도 시작 */
-                height: 60vh; /* 지도는 나머지 공간 채움 */
+                top: 40vh;
+                height: 60vh;
             }
         }
     </style>
