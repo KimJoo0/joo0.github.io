@@ -19,9 +19,11 @@ function initializeMap() {
 
     var map = new kakao.maps.Map(mapContainer, mapOption);
     var ps = new kakao.maps.services.Places();
-    var infowindow = new kakao.maps.InfoWindow({zIndex: 100}); // zIndex를 100으로 높임
+    var infowindow = new kakao.maps.InfoWindow({zIndex: 20});
 
     var searchForm = document.getElementById('searchForm');
+    var menuWrap = document.getElementById('menu_wrap'); // 검색창 요소 참조
+
     searchForm.addEventListener('submit', function(e) {
         e.preventDefault();
         searchPlaces();
@@ -74,6 +76,7 @@ function initializeMap() {
                     if (currentMarker === marker) {
                         infowindow.close();
                         currentMarker = null;
+                        menuWrap.style.zIndex = '10'; // 인포윈도우 닫힐 때 복구
                     } else {
                         infowindow.close();
                         displayInfowindow(marker, place);
@@ -85,6 +88,7 @@ function initializeMap() {
                     if (currentMarker === marker) {
                         infowindow.close();
                         currentMarker = null;
+                        menuWrap.style.zIndex = '10'; // 인포윈도우 닫힐 때 복구
                     } else {
                         infowindow.close();
                         displayInfowindow(marker, place);
@@ -256,23 +260,19 @@ function initializeMap() {
             </div>
         `;
 
+        // 인포윈도우 열릴 때 검색창 z-index를 0으로 설정
+        menuWrap.style.zIndex = '0';
+
         content.addEventListener('click', function(e) {
             if (e.target.tagName !== 'SELECT' && e.target.tagName !== 'OPTION') {
                 infowindow.close();
                 currentMarker = null;
+                menuWrap.style.zIndex = '10'; // 인포윈도우 닫힐 때 복구
             }
         });
 
         infowindow.setContent(content);
         infowindow.open(map, marker);
-
-        // 인포윈도우의 상위 요소 z-index 강제 조정 (필요 시)
-        setTimeout(() => {
-            const infoWrapper = content.parentElement;
-            if (infoWrapper) {
-                infoWrapper.style.zIndex = '100';
-            }
-        }, 0);
 
         const revisitIntentSelect = document.getElementById(`revisitIntent_${placeData.name}`);
         const revisitCountSection = document.getElementById(`revisitCount_${placeData.name}`);
