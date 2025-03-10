@@ -295,7 +295,7 @@ select {
 
 /* Custom Overlay Styles from Your First Code */
 .overlaybox {
-    position: relative;
+    position: absolute;
     width: 360px;
     height: auto;
     max-height: 350px;
@@ -320,7 +320,7 @@ select {
     width: 247px;
 }
 .overlaybox li {
-    position: relative;
+    position: absolute;
     margin-bottom: 2px;
     background: #2b2d36;
     padding: 5px 10px;
@@ -354,4 +354,18 @@ select {
     width: 300px;
     max-height: 350px;
     overflow-y: auto;
+}
+
+#visitedOverlay {
+    position: absolute;
+    top: 50px;      /* 버튼 바로 아래 위치 (필요에 따라 조정) */
+    right: 10px;    /* 오른쪽 상단에 고정 */
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 10px;
+    z-index: 15;
+    width: 300px;
+    max-height: 350px;
+    overflow-y: auto;
+    display: none;  /* 기본은 숨김 처리 */
 }
