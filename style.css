@@ -25,7 +25,7 @@ html, body {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 0;
+    z-index: 10;
 }
 #menu_wrap {
     position: absolute;
