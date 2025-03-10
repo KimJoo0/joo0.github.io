@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>키워드로 장소검색하고 목록으로 표출하기</title>
     <link rel="stylesheet" href="style.css">
-    <!-- 카카오맵 SDK 로드 -->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=a516d14907278badec077745b1651dc8&libraries=services"></script>
 </head>
 <body>
@@ -24,11 +23,15 @@
             <ul id="placesList"></ul>
             <div id="pagination"></div>
         </div>
+        <!-- 방문했던 식당 버튼과 오버레이(추가 예정) -->
+        <button id="visitedRestaurantsBtn" class="visited-btn">방문했던 식당</button>
+        <div id="visitedOverlay"></div>
     </div>
-    <!-- JS 파일 연결 -->
     <script src="map-init.js"></script>
     <script src="ui-utils.js"></script>
     <script src="infowindow.js"></script>
     <script src="search-places.js"></script>
+    <!-- 방문했던 식당 로직 추가 -->
+    <script src="visited-restaurants.js"></script>
 </body>
 </html>
