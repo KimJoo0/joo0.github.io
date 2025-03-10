@@ -34,6 +34,11 @@ function displayInfowindow(marker, place) {
     
     const totalRevisitRate = Object.values(placeData.revisitRate).reduce((a, b) => a + b, 0);
 
+    // localStorage에서 저장된 데이터 불러오기
+    const savedData = JSON.parse(localStorage.getItem(placeData.name)) || {};
+    const initialRevisitIntent = savedData.revisitIntent || "아직방문안함";
+    const initialRevisitCount = savedData.revisitCount || "0";
+
     const content = document.createElement('div');
     content.className = 'infowindow-content';
     content.innerHTML = `
@@ -89,34 +94,39 @@ function displayInfowindow(marker, place) {
         <div class="revisit-section">
             <label>재방문 의사:</label>
             <select id="revisitIntent_${placeData.name}" class="revisit-intent-select">
-                <option value="아직방문안함">아직방문안함</option>
-                <option value="X">X</option>
-                <option value="O">O</option>
+                <option value="아직방문안함" ${initialRevisitIntent === "아직방문안함" ? "selected" : ""}>아직방문안함</option>
+                <option value="X" ${initialRevisitIntent === "X" ? "selected" : ""}>X</option>
+                <option value="O" ${initialRevisitIntent === "O" ? "selected" : ""}>O</option>
             </select>
         </div>
         <div id="revisitCount_${placeData.name}" class="revisit-count-section">
             <label>재방문 횟수:</label>
             <select id="revisitCountSelect_${placeData.name}" class="revisit-count-select">
-                <option value="0">0</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3+">3+</option>
+                <option value="0" ${initialRevisitCount === "0" ? "selected" : ""}>0</option>
+                <option value="1" ${initialRevisitCount === "1" ? "selected" : ""}>1</option>
+                <option value="2" ${initialRevisitCount === "2" ? "selected" : ""}>2</option>
+                <option value="3+" ${initialRevisitCount === "3+" ? "selected" : ""}>3+</option>
             </select>
         </div>
     `;
 
-    // 기존 인포윈도우 닫기
+    // 기존 오버레이 닫기
     if (window.currentOverlay) {
         window.currentOverlay.setMap(null);
     }
 
-    // 커스텀 오버레이 생성
     const customOverlay = new kakao.maps.CustomOverlay({
         position: marker.getPosition(),
         content: content,
-        yAnchor: 1, // 마커 위에 표시
+        yAnchor: 1,
         zIndex: 3
     });
+
+    // 지도 이동: 마커 위치로 부드럽게 이동
+    const markerPosition = marker.getPosition();
+    window.map.panTo(markerPosition); // 부드러운 이동
+    // 필요하면 줌 레벨 조정 (예: 3으로 고정하거나 현재 레벨 유지)
+    // window.map.setLevel(3); // 주석 처리된 상태로 선택적 사용 가능
 
     if (isMobile()) {
         document.getElementById('menu_wrap').style.zIndex = '0';
@@ -137,10 +147,22 @@ function displayInfowindow(marker, place) {
 
     const revisitIntentSelect = document.getElementById(`revisitIntent_${placeData.name}`);
     const revisitCountSection = document.getElementById(`revisitCount_${placeData.name}`);
+    const revisitCountSelect = document.getElementById(`revisitCountSelect_${placeData.name}`);
 
-    revisitCountSection.style.display = revisitIntentSelect.value === "O" ? "block" : "none";
+    // 초기 상태 설정
+    revisitCountSection.style.display = initialRevisitIntent === "O" ? "block" : "none";
+    if (initialRevisitIntent === "O") {
+        revisitCountSection.classList.add('visible');
+    }
 
+    // 재방문 의사 변경 시 저장 및 UI 업데이트
     revisitIntentSelect.addEventListener('change', function() {
+        const data = {
+            revisitIntent: this.value,
+            revisitCount: revisitCountSelect.value
+        };
+        localStorage.setItem(placeData.name, JSON.stringify(data));
+
         if (this.value === "O") {
             revisitCountSection.style.display = "block";
             revisitCountSection.classList.add('visible');
@@ -151,6 +173,16 @@ function displayInfowindow(marker, place) {
             }, 300);
         }
         console.log(`${placeData.name}의 재방문 의사: ${this.value}`);
+    });
+
+    // 재방문 횟수 변경 시 저장
+    revisitCountSelect.addEventListener('change', function() {
+        const data = {
+            revisitIntent: revisitIntentSelect.value,
+            revisitCount: this.value
+        };
+        localStorage.setItem(placeData.name, JSON.stringify(data));
+        console.log(`${placeData.name}의 재방문 횟수: ${this.value}`);
     });
 }
 
