@@ -1,3 +1,4 @@
+// infowindow.js
 function displayInfowindow(marker, place) {
     const placeData = {
         name: place.place_name,
@@ -7,8 +8,6 @@ function displayInfowindow(marker, place) {
     };
     
     const totalRevisitRate = Object.values(placeData.revisitRate).reduce((a, b) => a + b, 0);
-
-    // localStorage에서 저장된 데이터 불러오기
     const savedData = JSON.parse(localStorage.getItem(placeData.name)) || {};
     const initialRevisitIntent = savedData.revisitIntent || "아직방문안함";
     const initialRevisitCount = savedData.revisitCount || "0";
@@ -84,7 +83,6 @@ function displayInfowindow(marker, place) {
         </div>
     `;
 
-    // 기존 오버레이 닫기
     if (window.currentOverlay) {
         window.currentOverlay.setMap(null);
     }
@@ -96,12 +94,10 @@ function displayInfowindow(marker, place) {
         zIndex: 3
     });
 
-    // 지도 이동: 마커 위치로 부드럽게 이동
     const markerPosition = marker.getPosition();
-    window.map.panTo(markerPosition); // 부드러운 이동
-    // 필요하면 줌 레벨 조정 (예: 3으로 고정하거나 현재 레벨 유지)
-    // window.map.setLevel(3); // 주석 처리된 상태로 선택적 사용 가능
+    window.map.panTo(markerPosition);
 
+    // 모바일에서 인포윈도우가 열릴 때 검색창 z-index 조정
     if (isMobile()) {
         document.getElementById('menu_wrap').style.zIndex = '0';
     }
@@ -110,6 +106,7 @@ function displayInfowindow(marker, place) {
         if (e.target.tagName !== 'SELECT' && e.target.tagName !== 'OPTION') {
             customOverlay.setMap(null);
             window.currentOverlay = null;
+            // 인포윈도우 닫힐 때 z-index 복구
             if (isMobile()) {
                 document.getElementById('menu_wrap').style.zIndex = '10';
             }
@@ -123,13 +120,11 @@ function displayInfowindow(marker, place) {
     const revisitCountSection = document.getElementById(`revisitCount_${placeData.name}`);
     const revisitCountSelect = document.getElementById(`revisitCountSelect_${placeData.name}`);
 
-    // 초기 상태 설정
     revisitCountSection.style.display = initialRevisitIntent === "O" ? "block" : "none";
     if (initialRevisitIntent === "O") {
         revisitCountSection.classList.add('visible');
     }
 
-    // 재방문 의사 변경 시 저장 및 UI 업데이트
     revisitIntentSelect.addEventListener('change', function() {
         const data = {
             revisitIntent: this.value,
@@ -149,7 +144,6 @@ function displayInfowindow(marker, place) {
         console.log(`${placeData.name}의 재방문 의사: ${this.value}`);
     });
 
-    // 재방문 횟수 변경 시 저장
     revisitCountSelect.addEventListener('change', function() {
         const data = {
             revisitIntent: revisitIntentSelect.value,
