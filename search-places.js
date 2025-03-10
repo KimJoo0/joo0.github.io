@@ -27,7 +27,7 @@ function displayPlaces(places) {
         fragment = document.createDocumentFragment(),
         bounds = new kakao.maps.LatLngBounds();
 
-    removeAllChildNods(listEl);
+    removeAllChildNodes(listEl);
     removeMarker();
 
     for (var i = 0; i < places.length; i++) {
