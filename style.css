@@ -26,7 +26,6 @@ html, body {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 5; 
 }
 #menu_wrap {
     position: absolute;
@@ -37,9 +36,10 @@ html, body {
     padding: 5px;
     overflow-y: auto;
     background: rgba(255, 255, 255, 0.7);
-    z-index: 10;
+    z-index: 1;
     font-size: 12px;
-    border-radius: 10px;
+    border-radius: 8px; /* 통일: 10px → 8px */
+    border: 1px solid #fff;
     box-sizing: border-box;
 }
 .bg_white {
@@ -141,7 +141,8 @@ html, body {
     height: 20px;
     background: #eee;
     position: relative;
-    border-radius: 4px;
+    border-radius: 8px; /* 통일: 4px → 8px */
+    border: 1px solid #fff;
     overflow: hidden;
 }
 .bar-segment {
@@ -156,7 +157,8 @@ html, body {
     height: 20px;
     background: #eee;
     position: relative;
-    border-radius: 4px;
+    border-radius: 8px; /* 통일: 4px → 8px */
+    border: 1px solid #fff;
     overflow: hidden;
 }
 .revisit-segment {
@@ -170,8 +172,8 @@ html, body {
 select {
     margin: 5px;
     padding: 5px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+    border-radius: 8px; /* 통일: 4px → 8px */
+    border: 1px solid #fff;
 }
 @media (max-width: 768px) {
     #menu_wrap {
@@ -183,18 +185,19 @@ select {
     }
 }
 
-/* 인포윈도우 스타일 추가 */
+/* 인포윈도우 스타일 */
 .infowindow-content {
     padding: 10px;
-    width: 300px;
+    min-width: 100px;
+    max-width: 350px;
+    height: auto;
     background: #fff;
-    border-radius: 8px;
+    border: 1px solid #000000;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     font-size: 14px;
     line-height: 1.5;
-    z-index: 20; 
-    position: relative;
-
+    box-sizing: border-box;
+    transition: height 0.3s ease;
 }
 
 .select-group {
@@ -235,7 +238,8 @@ select {
 
 .revisit-intent-select {
     background-color: #f9f9f9;
-    border: 1px solid #ddd;
+    border: 1px solid #fff;
+    border-radius: 8px; /* 통일: 4px → 8px */
     transition: border-color 0.3s ease;
 }
 
@@ -254,12 +258,13 @@ select {
 
 .revisit-count-section.visible {
     opacity: 1;
-    max-height: 50px; /* 충분한 높이로 조정 */
+    max-height: 50px;
 }
 
 .revisit-count-select {
     background-color: #f9f9f9;
-    border: 1px solid #ddd;
+    border: 1px solid #fff;
+    border-radius: 8px; /* 통일: 4px → 8px */
     transition: border-color 0.3s ease;
 }
 
