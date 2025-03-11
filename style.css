@@ -26,26 +26,6 @@ html, body {
     top: 0;
     left: 0;
     z-index: 10;
-    -webkit-tap-highlight-color: transparent; /* 모바일 터치 하이라이트 제거 */
-    -webkit-user-select: none; /* 텍스트 선택 방지 (필요 시) */
-    user-select: none;
-}
-
-/* 모바일에서만 적용 */
-@media (max-width: 768px) {
-    #map {
-        -webkit-tap-highlight-color: transparent !important;
-    }
-    #menu_wrap {
-        width: 100%;
-        max-width: 250px;
-        bottom: auto;
-        height: auto;
-        max-height: 30vh;
-    }
-    #menu_wrap.mobile-hidden {
-        z-index: 0 !important;
-    }
 }
 
 #menu_wrap {
