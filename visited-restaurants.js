@@ -10,11 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 const key = localStorage.key(i);
                 try {
                     const data = JSON.parse(localStorage.getItem(key));
-                    if (data && (data.revisitIntent === "X" || data.revisitIntent === "O")) {
+                    if (data && ['X', 'O', '아직방문안함'].includes(data.revisitIntent)) {
                         visitedPlaces.push({
                             name: key,
-                            intent: data.revisitIntent,
-                            count: data.revisitCount || '0'
+                            intent: data.revisitIntent || '아직방문안함',
+                            count: data.revisitCount || '1회'
                         });
                     }
                 } catch (e) {
@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
         overlayDiv.appendChild(titleDiv);
 
         const ul = document.createElement('ul');
+        ul.style.maxHeight = '300px';
+        ul.style.overflowY = 'auto';
+
         if (visitedPlaces.length === 0) {
             const li = document.createElement('li');
             li.innerHTML = '<span class="title">재방문 의사가 설정된 식당이 없습니다.</span>';
@@ -43,18 +46,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 const li = document.createElement('li');
                 li.innerHTML = `
                     <span class="title">${place.name}</span>
-                    <span class="intent">의사: ${place.intent}</span>
-                    <span class="count">횟수: ${place.count}</span>
+                    <select class="intent-select" data-name="${place.name}">
+                        <option value="아직방문안함" ${place.intent === '아직방문안함' ? 'selected' : ''}>아직방문안함</option>
+                        <option value="X" ${place.intent === 'X' ? 'selected' : ''}>X</option>
+                        <option value="O" ${place.intent === 'O' ? 'selected' : ''}>O</option>
+                    </select>
+                    <select class="count-select" data-name="${place.name}">
+                        <option value="1회" ${place.count === '0회' ? 'selected' : ''}>0회</option>
+                        <option value="1회" ${place.count === '1회' ? 'selected' : ''}>1회</option>
+                        <option value="2회" ${place.count === '2회' ? 'selected' : ''}>2회</option>
+                        <option value="3+" ${place.count === '3+' ? 'selected' : ''}>3+</option>
+                    </select>
                 `;
                 ul.appendChild(li);
             });
         }
         overlayDiv.appendChild(ul);
 
+        // 수정 이벤트 리스너 추가
+        ul.querySelectorAll('.intent-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const name = this.dataset.name;
+                const newIntent = this.value;
+                updateLocalStorage(name, newIntent, null);
+            });
+        });
+
+        ul.querySelectorAll('.count-select').forEach(select => {
+            select.addEventListener('change', function() {
+                const name = this.dataset.name;
+                const newCount = this.value;
+                updateLocalStorage(name, null, newCount);
+            });
+        });
+
         return overlayDiv;
     }
 
-    // 버튼 위치 계산 함수 (대체 방법)
+    // localStorage 업데이트 함수
+    function updateLocalStorage(name, intent, count) {
+        try {
+            const data = JSON.parse(localStorage.getItem(name)) || {};
+            if (intent !== null) data.revisitIntent = intent;
+            if (count !== null) data.revisitCount = count;
+            localStorage.setItem(name, JSON.stringify(data));
+            console.log(`Updated ${name}:`, data);
+        } catch (e) {
+            console.error(`Error updating localStorage for ${name}:`, e);
+        }
+    }
+
+    // 버튼 위치 계산 함수
     function getButtonPosition() {
         if (!window.map) {
             console.error('Map is not initialized');
@@ -69,10 +111,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const mapRect = mapContainer.getBoundingClientRect();
-        const screenX = btnRect.left - mapRect.left + btnRect.width / 2; // 버튼 중앙
-        const screenY = btnRect.bottom - mapRect.top + 10; // 버튼 아래
+        const screenX = btnRect.left - mapRect.left + btnRect.width / 2;
+        const screenY = btnRect.bottom - mapRect.top + 10;
 
-        // 지도의 현재 중심과 bounds를 사용해 상대적 위치 계산
         const bounds = window.map.getBounds();
         const sw = bounds.getSouthWest();
         const ne = bounds.getNorthEast();
@@ -119,8 +160,8 @@ document.addEventListener('DOMContentLoaded', function() {
         visitedOverlay = new kakao.maps.CustomOverlay({
             position: position,
             content: content,
-            xAnchor: 0.85, // 중앙 정렬
-            yAnchor: 0,   // 상단 기준
+            xAnchor: 0.85,
+            yAnchor: 0,
             zIndex: 20
         });
 
@@ -128,15 +169,21 @@ document.addEventListener('DOMContentLoaded', function() {
             visitedOverlay.setMap(window.map);
             console.log('Overlay opened at:', position);
 
-            // 클릭 이벤트 추가
             content.querySelectorAll('li').forEach(item => {
-                item.addEventListener('click', () => {
-                    if (visitedOverlay) {
-                        visitedOverlay.setMap(null);
-                        visitedOverlay = null;
-                        console.log('Overlay closed by item click');
+                item.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'SELECT') {
+                        if (visitedOverlay) {
+                            visitedOverlay.setMap(null);
+                            visitedOverlay = null;
+                            console.log('Overlay closed by item click');
+                        }
                     }
                 });
+            });
+
+            // 스크롤 이벤트 방지
+            content.addEventListener('wheel', (e) => {
+                e.stopPropagation();
             });
         } catch (e) {
             console.error('Error setting overlay:', e);
@@ -149,7 +196,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Visited restaurants button not found');
     }
 
-    // 지도 중심 변경 이벤트
     if (window.kakao && kakao.maps && kakao.maps.event) {
         kakao.maps.event.addListener(window.map, 'center_changed', function() {
             if (visitedOverlay) {

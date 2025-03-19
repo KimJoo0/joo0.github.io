@@ -314,11 +314,15 @@ select {
     text-align: center;
 }
 
+
 .overlaybox ul {
     margin: 0;
     padding: 0;
     list-style: none;
+    max-height: 300px; /* 스크롤을 위한 최대 높이 */
+    overflow-y: auto;  /* 세로 스크롤 활성화 */
 }
+
 
 .overlaybox li {
     background: #f9f9f9;
@@ -351,4 +355,25 @@ select {
 .overlaybox li:hover {
     background: #e0e0e0;
     color: #000;
+}
+
+
+
+.overlaybox li select {
+    padding: 2px;
+    font-size: 12px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background: #fff;
+    cursor: pointer;
+}
+
+.overlaybox li .intent-select {
+    width: 50px;
+    margin-left: 10px;
+}
+
+.overlaybox li .count-select {
+    width: 50px;
+    margin-left: 10px;
 }
