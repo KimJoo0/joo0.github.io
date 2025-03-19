@@ -10,7 +10,7 @@ function displayInfowindow(marker, place) {
     const totalRevisitRate = Object.values(placeData.revisitRate).reduce((a, b) => a + b, 0);
     const savedData = JSON.parse(localStorage.getItem(placeData.name)) || {};
     const initialRevisitIntent = savedData.revisitIntent || "아직방문안함";
-    const initialRevisitCount = savedData.revisitCount || "0";
+    const initialRevisitCount = savedData.revisitCount || "0회";
 
     const content = document.createElement('div');
     content.className = 'infowindow-content';
@@ -75,9 +75,9 @@ function displayInfowindow(marker, place) {
         <div id="revisitCount_${placeData.name}" class="revisit-count-section">
             <label>재방문 횟수:</label>
             <select id="revisitCountSelect_${placeData.name}" class="revisit-count-select">
-                <option value="0" ${initialRevisitCount === "0" ? "selected" : ""}>0</option>
-                <option value="1" ${initialRevisitCount === "1" ? "selected" : ""}>1</option>
-                <option value="2" ${initialRevisitCount === "2" ? "selected" : ""}>2</option>
+                <option value="0회" ${initialRevisitCount === "0회" ? "selected" : ""}>0회</option>
+                <option value="1회" ${initialRevisitCount === "1회" ? "selected" : ""}>1회</option>
+                <option value="2회" ${initialRevisitCount === "2회" ? "selected" : ""}>2회</option>
                 <option value="3+" ${initialRevisitCount === "3+" ? "selected" : ""}>3+</option>
             </select>
         </div>

@@ -152,10 +152,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (visitedOverlay) {
             visitedOverlay.setMap(null);
             visitedOverlay = null;
-            if (menuWrap) menuWrap.style.zIndex = '10'; // 원래 z-index로 복원
-            console.log('Overlay closed');
+            if (menuWrap && isMobile()) { // 모바일에서만 z-index 복원
+                menuWrap.style.zIndex = '10';}
             return;
         }
+
 
         const content = createVisitedList();
         const position = getButtonPosition();
@@ -175,8 +176,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             visitedOverlay.setMap(window.map);
-            if (menuWrap) menuWrap.style.zIndex = '0'; // 검색 목록 숨김
-            console.log('Overlay opened at:', position);
+           if (menuWrap && isMobile()) { // 모바일에서만 z-index 조정
+                menuWrap.style.zIndex = '0';
+            }
+
 
             content.querySelectorAll('li').forEach(item => {
                 item.addEventListener('click', (e) => {
