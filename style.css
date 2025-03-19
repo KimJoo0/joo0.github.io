@@ -369,11 +369,11 @@ select {
 }
 
 .overlaybox li .intent-select {
-    width: 50px;
+    width: 100px;
     margin-left: 10px;
 }
 
 .overlaybox li .count-select {
-    width: 50px;
+    width: 60px;
     margin-left: 10px;
 }

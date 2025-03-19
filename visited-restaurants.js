@@ -10,11 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const key = localStorage.key(i);
                 try {
                     const data = JSON.parse(localStorage.getItem(key));
-                    if (data && ['X', 'O', '아직방문안함'].includes(data.revisitIntent)) {
+                    // "아직방문안함"이 아닌 경우만 추가
+                    if (data && ['X', 'O'].includes(data.revisitIntent)) {
                         visitedPlaces.push({
                             name: key,
-                            intent: data.revisitIntent || '아직방문안함',
-                            count: data.revisitCount || '1회'
+                            intent: data.revisitIntent,
+                            count: data.revisitCount || '0회'
                         });
                     }
                 } catch (e) {
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (visitedPlaces.length === 0) {
             const li = document.createElement('li');
-            li.innerHTML = '<span class="title">재방문 의사가 설정된 식당이 없습니다.</span>';
+            li.innerHTML = '<span class="title">방문했던 식당이 없습니다.</span>';
             ul.appendChild(li);
         } else {
             visitedPlaces.forEach(place => {
@@ -52,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <option value="O" ${place.intent === 'O' ? 'selected' : ''}>O</option>
                     </select>
                     <select class="count-select" data-name="${place.name}">
-                        <option value="1회" ${place.count === '0회' ? 'selected' : ''}>0회</option>
+                        <option value="0회" ${place.count === '0회' ? 'selected' : ''}>0회</option>
                         <option value="1회" ${place.count === '1회' ? 'selected' : ''}>1회</option>
                         <option value="2회" ${place.count === '2회' ? 'selected' : ''}>2회</option>
                         <option value="3+" ${place.count === '3+' ? 'selected' : ''}>3+</option>
@@ -69,6 +70,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const name = this.dataset.name;
                 const newIntent = this.value;
                 updateLocalStorage(name, newIntent, null);
+                // "아직방문안함"으로 변경 시 오버레이 즉시 업데이트
+                if (newIntent === '아직방문안함' && visitedOverlay) {
+                    visitedOverlay.setMap(null);
+                    visitedOverlay = null;
+                    toggleVisitedOverlay(); // 목록 갱신
+                }
             });
         });
 
