@@ -377,3 +377,12 @@ select {
     width: 60px;
     margin-left: 10px;
 }
+
+overlaybox .visited-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-height: 300px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* 모바일 스크롤 개선 */
+}

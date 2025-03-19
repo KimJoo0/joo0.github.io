@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const visitedBtn = document.getElementById('visitedRestaurantsBtn');
+    const menuWrap = document.getElementById('menu_wrap'); // 검색 목록 요소
     let visitedOverlay = null;
 
     // 방문했던 식당 목록 생성 함수
@@ -10,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const key = localStorage.key(i);
                 try {
                     const data = JSON.parse(localStorage.getItem(key));
-                    // "아직방문안함"이 아닌 경우만 추가
                     if (data && ['X', 'O'].includes(data.revisitIntent)) {
                         visitedPlaces.push({
                             name: key,
@@ -35,8 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
         overlayDiv.appendChild(titleDiv);
 
         const ul = document.createElement('ul');
+        ul.className = 'visited-list';
         ul.style.maxHeight = '300px';
         ul.style.overflowY = 'auto';
+        ul.style.webkitOverflowScrolling = 'touch';
 
         if (visitedPlaces.length === 0) {
             const li = document.createElement('li');
@@ -64,17 +66,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         overlayDiv.appendChild(ul);
 
-        // 수정 이벤트 리스너 추가
         ul.querySelectorAll('.intent-select').forEach(select => {
             select.addEventListener('change', function() {
                 const name = this.dataset.name;
                 const newIntent = this.value;
                 updateLocalStorage(name, newIntent, null);
-                // "아직방문안함"으로 변경 시 오버레이 즉시 업데이트
                 if (newIntent === '아직방문안함' && visitedOverlay) {
                     visitedOverlay.setMap(null);
                     visitedOverlay = null;
-                    toggleVisitedOverlay(); // 목록 갱신
+                    toggleVisitedOverlay();
                 }
             });
         });
@@ -152,6 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (visitedOverlay) {
             visitedOverlay.setMap(null);
             visitedOverlay = null;
+            if (menuWrap) menuWrap.style.zIndex = '10'; // 원래 z-index로 복원
             console.log('Overlay closed');
             return;
         }
@@ -174,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             visitedOverlay.setMap(window.map);
+            if (menuWrap) menuWrap.style.zIndex = '0'; // 검색 목록 숨김
             console.log('Overlay opened at:', position);
 
             content.querySelectorAll('li').forEach(item => {
@@ -182,14 +184,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (visitedOverlay) {
                             visitedOverlay.setMap(null);
                             visitedOverlay = null;
+                            if (menuWrap) menuWrap.style.zIndex = '10'; // 복원
                             console.log('Overlay closed by item click');
                         }
                     }
                 });
             });
 
-            // 스크롤 이벤트 방지
             content.addEventListener('wheel', (e) => {
+                e.stopPropagation();
+            });
+            content.addEventListener('touchmove', (e) => {
                 e.stopPropagation();
             });
         } catch (e) {
