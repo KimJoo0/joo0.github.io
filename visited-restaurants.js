@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const titleDiv = document.createElement('div');
         titleDiv.className = 'boxtitle';
-        titleDiv.textContent = '방문했던 식당';
+        titleDiv.textContent = '방문한 식당';
         overlayDiv.appendChild(titleDiv);
 
         const ul = document.createElement('ul');
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (visitedPlaces.length === 0) {
             const li = document.createElement('li');
-            li.innerHTML = '<span class="title">방문했던 식당이 없습니다.</span>';
+            li.innerHTML = '<span class="title">방문한 식당이 없습니다.</span>';
             ul.appendChild(li);
         } else {
             visitedPlaces.forEach(place => {
