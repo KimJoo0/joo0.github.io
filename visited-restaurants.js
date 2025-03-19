@@ -1,102 +1,165 @@
-// visited-restaurants.js
 document.addEventListener('DOMContentLoaded', function() {
     const visitedBtn = document.getElementById('visitedRestaurantsBtn');
     let visitedOverlay = null;
 
-    // 방문했던 식당 목록 생성 함수 (X, O만 표시)
+    // 방문했던 식당 목록 생성 함수
     function createVisitedList() {
         const visitedPlaces = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            const data = JSON.parse(localStorage.getItem(key));
-            // revisitIntent가 "X" 또는 "O"인 경우만 추가
-            if (data && (data.revisitIntent === "X" || data.revisitIntent === "O")) {
-                visitedPlaces.push({
-                    name: key,
-                    intent: data.revisitIntent,
-                    count: data.revisitCount || '0'
-                });
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                try {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    if (data && (data.revisitIntent === "X" || data.revisitIntent === "O")) {
+                        visitedPlaces.push({
+                            name: key,
+                            intent: data.revisitIntent,
+                            count: data.revisitCount || '0'
+                        });
+                    }
+                } catch (e) {
+                    console.error(`Error parsing localStorage data for key ${key}:`, e);
+                }
             }
+        } catch (e) {
+            console.error('Error accessing localStorage:', e);
         }
 
+        const overlayDiv = document.createElement('div');
+        overlayDiv.className = 'overlaybox';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'boxtitle';
+        titleDiv.textContent = '방문했던 식당';
+        overlayDiv.appendChild(titleDiv);
+
+        const ul = document.createElement('ul');
         if (visitedPlaces.length === 0) {
-            return '<div class="overlaybox">' +
-                   '    <div class="boxtitle">방문했던 식당</div>' +
-                   '    <ul><li><span class="title">재방문 의사가 설정된 식당이 없습니다.</span></li></ul>' +
-                   '</div>';
+            const li = document.createElement('li');
+            li.innerHTML = '<span class="title">재방문 의사가 설정된 식당이 없습니다.</span>';
+            ul.appendChild(li);
+        } else {
+            visitedPlaces.forEach(place => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="title">${place.name}</span>
+                    <span class="intent">의사: ${place.intent}</span>
+                    <span class="count">횟수: ${place.count}</span>
+                `;
+                ul.appendChild(li);
+            });
         }
+        overlayDiv.appendChild(ul);
 
-        let listItems = '';
-        visitedPlaces.forEach(place => {
-            listItems += `<li>
-                <span class="title">${place.name}</span>
-                <span class="intent">의사: ${place.intent}</span>
-                <span class="count">횟수: ${place.count}</span>
-            </li>`;
-        });
-
-        return '<div class="overlaybox">' +
-               '    <div class="boxtitle">방문했던 식당</div>' +
-               '    <ul>' + listItems + '</ul>' +
-               '</div>';
+        return overlayDiv;
     }
 
-    // 버튼의 화면 좌표를 지도 좌표로 변환
+    // 버튼 위치 계산 함수 (대체 방법)
     function getButtonPosition() {
+        if (!window.map) {
+            console.error('Map is not initialized');
+            return null;
+        }
+
         const btnRect = visitedBtn.getBoundingClientRect();
         const mapContainer = document.getElementById('map');
+        if (!mapContainer) {
+            console.error('Map container not found');
+            return null;
+        }
+
         const mapRect = mapContainer.getBoundingClientRect();
+        const screenX = btnRect.left - mapRect.left + btnRect.width / 2; // 버튼 중앙
+        const screenY = btnRect.bottom - mapRect.top + 10; // 버튼 아래
+
+        // 지도의 현재 중심과 bounds를 사용해 상대적 위치 계산
+        const bounds = window.map.getBounds();
+        const sw = bounds.getSouthWest();
+        const ne = bounds.getNorthEast();
         
-        const screenX = btnRect.right - mapRect.left;
-        const screenY = btnRect.bottom - mapRect.top + 10;
+        const mapWidth = mapRect.width;
+        const mapHeight = mapRect.height;
         
-        return window.map.getProjection().latlngFromContainerPixel(new kakao.maps.Point(screenX, screenY));
+        const lngRange = ne.getLng() - sw.getLng();
+        const latRange = ne.getLat() - sw.getLat();
+        
+        const lng = sw.getLng() + (screenX / mapWidth) * lngRange;
+        const lat = ne.getLat() - (screenY / mapHeight) * latRange;
+
+        try {
+            return new kakao.maps.LatLng(lat, lng);
+        } catch (e) {
+            console.error('Error creating LatLng:', e);
+            return null;
+        }
     }
 
     // 오버레이 토글 함수
     function toggleVisitedOverlay() {
+        if (!window.map) {
+            console.error('Map is not initialized');
+            return;
+        }
+
         if (visitedOverlay) {
             visitedOverlay.setMap(null);
             visitedOverlay = null;
+            console.log('Overlay closed');
             return;
         }
 
         const content = createVisitedList();
         const position = getButtonPosition();
 
+        if (!position) {
+            console.error('Invalid position for overlay');
+            return;
+        }
+
         visitedOverlay = new kakao.maps.CustomOverlay({
             position: position,
             content: content,
-            xAnchor: 1,
-            yAnchor: 0,
+            xAnchor: 0.85, // 중앙 정렬
+            yAnchor: 0,   // 상단 기준
             zIndex: 20
         });
 
-        visitedOverlay.setMap(window.map);
+        try {
+            visitedOverlay.setMap(window.map);
+            console.log('Overlay opened at:', position);
 
-        // 목록 항목에 클릭 이벤트 추가
-        const overlayContent = visitedOverlay.getContent();
-        if (typeof overlayContent === 'string') {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = overlayContent;
-            const listItems = tempDiv.querySelectorAll('li');
-            listItems.forEach(item => {
-                item.addEventListener('click', function() {
+            // 클릭 이벤트 추가
+            content.querySelectorAll('li').forEach(item => {
+                item.addEventListener('click', () => {
                     if (visitedOverlay) {
                         visitedOverlay.setMap(null);
                         visitedOverlay = null;
+                        console.log('Overlay closed by item click');
                     }
                 });
             });
-            visitedOverlay.setContent(tempDiv);
+        } catch (e) {
+            console.error('Error setting overlay:', e);
         }
     }
 
-    visitedBtn.addEventListener('click', toggleVisitedOverlay);
+    if (visitedBtn) {
+        visitedBtn.addEventListener('click', toggleVisitedOverlay);
+    } else {
+        console.error('Visited restaurants button not found');
+    }
 
-    kakao.maps.event.addListener(window.map, 'center_changed', function() {
-        if (visitedOverlay) {
-            visitedOverlay.setPosition(getButtonPosition());
-        }
-    });
+    // 지도 중심 변경 이벤트
+    if (window.kakao && kakao.maps && kakao.maps.event) {
+        kakao.maps.event.addListener(window.map, 'center_changed', function() {
+            if (visitedOverlay) {
+                const newPosition = getButtonPosition();
+                if (newPosition) {
+                    visitedOverlay.setPosition(newPosition);
+                }
+            }
+        });
+    } else {
+        console.error('Kakao Maps event system not available');
+    }
 });
