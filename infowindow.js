@@ -102,35 +102,19 @@ function displayInfowindow(marker, place) {
         document.getElementById('menu_wrap').style.zIndex = '0';
     }
 
-    // 인포윈도우 내부 클릭 시 이벤트 전파 방지
     content.addEventListener('click', function(e) {
-        e.stopPropagation(); // 지도로 이벤트 전파 방지
-    });
-    content.addEventListener('touchstart', function(e) {
-        e.stopPropagation(); // 모바일 터치 이벤트 전파 방지
+        if (e.target.tagName !== 'SELECT' && e.target.tagName !== 'OPTION') {
+            customOverlay.setMap(null);
+            window.currentOverlay = null;
+            // 인포윈도우 닫힐 때 z-index 복구
+            if (isMobile()) {
+                document.getElementById('menu_wrap').style.zIndex = '10';
+            }
+        }
     });
 
     customOverlay.setMap(window.map);
     window.currentOverlay = customOverlay;
-
-    // 지도 클릭/터치 시 인포윈도우 닫기
-    function closeOverlayOnMapClick() {
-        if (window.currentOverlay) {
-            window.currentOverlay.setMap(null);
-            window.currentOverlay = null;
-            if (isMobile()) {
-                document.getElementById('menu_wrap').style.zIndex = '10'; // z-index 복구
-            }
-            console.log('Infowindow closed by map click/touch');
-            // 이벤트 리스너 제거
-            kakao.maps.event.removeListener(window.map, 'click', closeOverlayOnMapClick);
-            kakao.maps.event.removeListener(window.map, 'touchstart', closeOverlayOnMapClick);
-        }
-    }
-
-    // 지도에 클릭 및 터치 이벤트 리스너 추가
-    kakao.maps.event.addListener(window.map, 'click', closeOverlayOnMapClick);
-    kakao.maps.event.addListener(window.map, 'touchstart', closeOverlayOnMapClick);
 
     const revisitIntentSelect = document.getElementById(`revisitIntent_${placeData.name}`);
     const revisitCountSection = document.getElementById(`revisitCount_${placeData.name}`);

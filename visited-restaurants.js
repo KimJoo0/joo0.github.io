@@ -142,11 +142,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 모바일 체크 함수 (기존에 정의되어 있다고 가정하거나 새로 추가)
-    function isMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
-
     // 오버레이 토글 함수
     function toggleVisitedOverlay() {
         if (!window.map) {
@@ -157,9 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (visitedOverlay) {
             visitedOverlay.setMap(null);
             visitedOverlay = null;
-            if (menuWrap && isMobile()) { // 모바일에서만 z-index 복원
-                menuWrap.style.zIndex = '10';
-            }
+            if (menuWrap) menuWrap.style.zIndex = '10'; // 원래 z-index로 복원
             console.log('Overlay closed');
             return;
         }
@@ -182,46 +175,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             visitedOverlay.setMap(window.map);
-            if (menuWrap && isMobile()) { // 모바일에서만 z-index 조정
-                menuWrap.style.zIndex = '0';
-            }
+            if (menuWrap) menuWrap.style.zIndex = '0'; // 검색 목록 숨김
             console.log('Overlay opened at:', position);
 
-            // 오버레이 내부 클릭 시 이벤트 전파 방지
-            content.addEventListener('click', (e) => {
-                e.stopPropagation();
+            content.querySelectorAll('li').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'SELECT') {
+                        if (visitedOverlay) {
+                            visitedOverlay.setMap(null);
+                            visitedOverlay = null;
+                            if (menuWrap) menuWrap.style.zIndex = '10'; // 복원
+                            console.log('Overlay closed by item click');
+                        }
+                    }
+                });
             });
-            content.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-            });
+
             content.addEventListener('wheel', (e) => {
                 e.stopPropagation();
             });
             content.addEventListener('touchmove', (e) => {
                 e.stopPropagation();
             });
-
-            // 지도 클릭 시 오버레이 닫기
-            kakao.maps.event.addListener(window.map, 'click', closeOverlayOnMapClick);
-            kakao.maps.event.addListener(window.map, 'touchstart', closeOverlayOnMapClick);
-
         } catch (e) {
             console.error('Error setting overlay:', e);
-        }
-    }
-
-    // 지도 클릭/터치 시 오버레이 닫기 함수
-    function closeOverlayOnMapClick() {
-        if (visitedOverlay) {
-            visitedOverlay.setMap(null);
-            visitedOverlay = null;
-            if (menuWrap && isMobile()) { // 모바일에서만 z-index 복원
-                menuWrap.style.zIndex = '10';
-            }
-            console.log('Overlay closed by map click/touch');
-            // 이벤트 리스너 제거
-            kakao.maps.event.removeListener(window.map, 'click', closeOverlayOnMapClick);
-            kakao.maps.event.removeListener(window.map, 'touchstart', closeOverlayOnMapClick);
         }
     }
 
