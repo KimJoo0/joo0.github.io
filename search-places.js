@@ -100,3 +100,69 @@ document.getElementById('searchForm').addEventListener('submit', function(e) {
     e.preventDefault();
     searchPlaces();
 });
+
+// 기존 코드에 추가할 이벤트 핸들러
+function setupMapClickHandler() {
+    kakao.maps.event.addListener(window.map, 'click', function() {
+        // 검색창 포커스 제거
+        document.getElementById('keyword').blur();
+        
+        // 모바일에서 키패드 강제 숨김
+        if (isMobile()) {
+            document.activeElement.blur();
+            document.body.focus();
+        }
+    });
+}
+
+// 터치 이벤트도 추가 (모바일 지원)
+function setupMapTouchHandler() {
+    kakao.maps.event.addListener(window.map, 'touchstart', function() {
+        // 검색창 포커스 제거
+        document.getElementById('keyword').blur();
+        
+        // 모바일에서 키패드 강제 숨김
+        if (isMobile()) {
+            document.activeElement.blur();
+            document.body.focus();
+        }
+    });
+}
+
+// 기존 searchPlaces 함수에 이벤트 핸들러 호출 추가
+function searchPlaces() {
+    var keyword = document.getElementById('keyword').value;
+    if (!keyword.replace(/^\s+|\s+$/g, '')) {
+        alert('키워드를 입력해주세요!');
+        return false;
+    }
+    window.ps.keywordSearch(keyword, placesSearchCB);
+    
+    // 검색 후 즉시 포커스 제거
+    document.getElementById('keyword').blur();
+}
+
+// 초기화 시 이벤트 핸들러 설정 (지도가 로드된 후 호출해야 함)
+function initializeMapHandlers() {
+    setupMapClickHandler();
+    setupMapTouchHandler();
+}
+
+// 문서 로드 후 초기화 (기존 코드 맨 아래에 추가)
+document.addEventListener('DOMContentLoaded', function() {
+    // 기존 검색 폼 이벤트 리스너
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        searchPlaces();
+    });
+    
+    // 지도 이벤트 핸들러 초기화
+    // 주의: 이 부분은 지도 객체(window.map)가 생성된 후 호출되어야 합니다
+    // 지도 초기화 코드가 별도로 있다면 그 이후에 호출해야 함
+    initializeMapHandlers();
+});
+
+// 모바일 장치 체크 함수 (기존에 없던 경우 추가)
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
