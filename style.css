@@ -81,6 +81,7 @@ body {
 #menu_wrap.active {
   max-height: 60vh;
   overflow-y: auto;
+  z-index: 50; /* z-index 증가 */
 }
 
 #menu_wrap .option {
@@ -507,17 +508,29 @@ select {
   #menu_wrap.active {
     max-height: 50vh;
   }
+
+  /* 모바일에서 하단 컨트롤 패널 스타일 추가 */
+  .bottom-controls {
+    bottom: 15px;
+  }
+
+  .bottom-controls .control-btn {
+    min-width: 120px; /* 모바일에서 버튼 크기 증가 */
+    height: 44px; /* 모바일에서 버튼 높이 증가 */
+    font-size: 14px; /* 모바일에서 폰트 크기 증가 */
+  }
 }
 
 /* 하단 컨트롤 패널 */
 .bottom-controls {
-  position: absolute;
+  position: fixed; /* absolute에서 fixed로 변경 */
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 10px;
-  z-index: 5;
+  z-index: 100; /* z-index 증가 */
+  width: auto; /* 너비 자동 조정 */
 }
 
 .bottom-controls .control-btn {
@@ -525,6 +538,7 @@ select {
   height: 40px;
   border-radius: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0.9; /* 약간 투명하게 */
 }
 
 /* 애니메이션 */

@@ -5,7 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuWrap = document.getElementById("menu_wrap")
 
   if (searchToggleBtn && menuWrap) {
-    searchToggleBtn.addEventListener("click", () => {
+    searchToggleBtn.addEventListener("click", (e) => {
+      // 이벤트 전파 중지 - 버그 수정
+      e.stopPropagation()
       menuWrap.classList.toggle("active")
 
       // 검색창이 열리면 자동으로 포커스
@@ -17,6 +19,11 @@ document.addEventListener("DOMContentLoaded", () => {
           }, 300)
         }
       }
+    })
+
+    // 검색창 내부 클릭 시 이벤트 전파 중지 - 버그 수정
+    menuWrap.addEventListener("click", (e) => {
+      e.stopPropagation()
     })
   }
 
@@ -32,11 +39,11 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  // 지도 클릭 시 검색 패널 닫기
+  // 지도 클릭 시 검색 패널 닫기 (document 대신 map 요소에만 적용)
   const map = document.getElementById("map")
   if (map) {
     map.addEventListener("click", () => {
-      if (menuWrap.classList.contains("active")) {
+      if (menuWrap && menuWrap.classList.contains("active")) {
         menuWrap.classList.remove("active")
       }
     })
