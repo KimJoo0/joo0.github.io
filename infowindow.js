@@ -131,7 +131,7 @@ function displayInfowindow(marker, place) {
       const customOverlay = new kakao.maps.CustomOverlay({
         position: marker.getPosition(),
         content: content,
-        yAnchor: 0.5,
+        yAnchor: 0.7,
         zIndex: 3,
       })
 
