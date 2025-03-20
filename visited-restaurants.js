@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const ul = document.createElement("ul")
     ul.className = "visited-list"
+    ul.style.maxHeight = isMobile() ? "50vh" : "60vh"
+    ul.style.overflowY = "auto"
 
     // 로딩 메시지 표시
     const loadingLi = document.createElement("li")
@@ -256,6 +258,10 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   } else {
     console.error("Kakao Maps event system not available")
+  }
+
+  function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   }
 })
 

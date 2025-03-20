@@ -60,18 +60,28 @@
             function updateAuthUI(isLoggedIn) {
                 const loginStatus = document.getElementById('login-status');
                 const authButton = document.getElementById('auth-button');
+                const userProfile = document.getElementById('user-profile');
                 
-                if (!loginStatus || !authButton) {
+                if (!loginStatus || !authButton || !userProfile) {
                     console.error('인증 UI 요소를 찾을 수 없습니다.');
                     return;
                 }
                 
                 if (isLoggedIn && window.currentUser) {
-                    loginStatus.textContent = `${window.currentUser.email}`;
-                    authButton.textContent = '로그아웃';
+                    // 로그인 상태
+                    loginStatus.style.display = 'none';
+                    authButton.style.display = 'none';
+                    userProfile.style.display = 'flex';
+                    
+                    // 사용자 이메일에서 첫 글자 추출
+                    const initial = window.currentUser.email.charAt(0).toUpperCase();
+                    userProfile.textContent = initial;
+                    userProfile.title = window.currentUser.email;
                 } else {
-                    loginStatus.textContent = '로그인하세요';
-                    authButton.textContent = '로그인';
+                    // 로그아웃 상태
+                    loginStatus.style.display = 'none';
+                    authButton.style.display = 'flex';
+                    userProfile.style.display = 'none';
                 }
             }
             
@@ -95,6 +105,7 @@
                 <div id="auth-container" class="auth-container">
                     <div id="login-status" class="login-status">로그인하세요</div>
                     <button id="auth-button" class="control-btn auth-btn">로그인</button>
+                    <div id="user-profile" class="user-profile" style="display: none;"></div>
                 </div>
             </div>
         </div>

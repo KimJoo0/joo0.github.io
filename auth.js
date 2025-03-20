@@ -1,13 +1,36 @@
 // 사용자 인증 관련 기능
 document.addEventListener("DOMContentLoaded", () => {
   const authButton = document.getElementById("auth-button")
+  const userProfile = document.getElementById("user-profile")
 
-  if (!authButton) {
-    console.error("인증 버튼을 찾을 수 없습니다.")
+  if (!authButton || !userProfile) {
+    console.error("인증 버튼 또는 사용자 프로필 요소를 찾을 수 없습니다.")
     return
   }
 
   console.log("인증 버튼 이벤트 리스너 설정됨")
+
+  // 사용자 프로필 클릭 이벤트 (로그아웃)
+  userProfile.addEventListener("click", () => {
+    if (window.currentUser) {
+      // 로그아웃 확인
+      if (confirm("로그아웃 하시겠습니까?")) {
+        // 로그아웃
+        console.log("로그아웃 시도 중...")
+        firebase
+          .auth()
+          .signOut()
+          .then(() => {
+            console.log("로그아웃 성공")
+            alert("로그아웃되었습니다.")
+          })
+          .catch((error) => {
+            console.error("로그아웃 오류:", error)
+            alert("로그아웃 중 오류가 발생했습니다: " + error.message)
+          })
+      }
+    }
+  })
 
   authButton.addEventListener("click", () => {
     console.log("인증 버튼 클릭됨")
