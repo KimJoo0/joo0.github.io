@@ -186,7 +186,7 @@ body {
   line-height: 1.5;
   box-sizing: border-box;
   transition: height 0.3s ease;
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -436,7 +436,7 @@ select {
   overflow-y: auto;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   z-index: 200; /* z-index 증가 */
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
