@@ -1,12 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   const visitedBtn = document.getElementById("visitedRestaurantsBtn")
-  const menuWrap = document.getElementById("menu_wrap") // 검색 목록 요소
   let visitedOverlay = null
 
   // 방문했던 식당 목록 생성 함수
   function createVisitedList() {
     const overlayDiv = document.createElement("div")
-    overlayDiv.className = "overlaybox"
+    overlayDiv.className = "overlaybox fade-in"
 
     const titleDiv = document.createElement("div")
     titleDiv.className = "boxtitle"
@@ -15,9 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const ul = document.createElement("ul")
     ul.className = "visited-list"
-    ul.style.maxHeight = "300px"
-    ul.style.overflowY = "auto"
-    ul.style.webkitOverflowScrolling = "touch"
 
     // 로딩 메시지 표시
     const loadingLi = document.createElement("li")
@@ -168,43 +164,17 @@ document.addEventListener("DOMContentLoaded", () => {
     return overlayDiv
   }
 
-  // 버튼 위치 계산 함수
-  function getButtonPosition() {
+  // 오버레이 위치 계산 함수 (모바일 최적화)
+  function getOverlayPosition() {
     if (!window.map) {
       console.error("Map is not initialized")
       return null
     }
 
-    const btnRect = visitedBtn.getBoundingClientRect()
-    const mapContainer = document.getElementById("map")
-    if (!mapContainer) {
-      console.error("Map container not found")
-      return null
-    }
+    // 지도 중앙에 오버레이 표시
+    const center = window.map.getCenter()
 
-    const mapRect = mapContainer.getBoundingClientRect()
-    const screenX = btnRect.left - mapRect.left + btnRect.width / 2
-    const screenY = btnRect.bottom - mapRect.top + 10
-
-    const bounds = window.map.getBounds()
-    const sw = bounds.getSouthWest()
-    const ne = bounds.getNorthEast()
-
-    const mapWidth = mapRect.width
-    const mapHeight = mapRect.height
-
-    const lngRange = ne.getLng() - sw.getLng()
-    const latRange = ne.getLat() - sw.getLat()
-
-    const lng = sw.getLng() + (screenX / mapWidth) * lngRange
-    const lat = ne.getLat() - (screenY / mapHeight) * latRange
-
-    try {
-      return new kakao.maps.LatLng(lat, lng)
-    } catch (e) {
-      console.error("Error creating LatLng:", e)
-      return null
-    }
+    return center
   }
 
   // 오버레이 토글 함수
@@ -217,47 +187,46 @@ document.addEventListener("DOMContentLoaded", () => {
     if (visitedOverlay) {
       visitedOverlay.setMap(null)
       visitedOverlay = null
-      if (menuWrap) menuWrap.style.zIndex = "10" // 원래 z-index로 복원
       console.log("Overlay closed")
       return
     }
 
     const content = createVisitedList()
-    const position = getButtonPosition()
+    const position = getOverlayPosition()
 
     if (!position) {
       console.error("Invalid position for overlay")
       return
     }
 
-    const kakao = window.kakao // kakao 변수 선언 및 window.kakao 할당
+    // kakao 변수 선언 (kakao maps api 사용을 위해)
+    const kakao = window.kakao
 
     visitedOverlay = new kakao.maps.CustomOverlay({
       position: position,
       content: content,
-      xAnchor: 0.85,
-      yAnchor: 0,
+      xAnchor: 0.5,
+      yAnchor: 0.5,
       zIndex: 20,
     })
 
     try {
       visitedOverlay.setMap(window.map)
-      if (menuWrap) menuWrap.style.zIndex = "0" // 검색 목록 숨김
-      console.log("Overlay opened at:", position)
+      console.log("Overlay opened")
 
-      content.querySelectorAll("li").forEach((item) => {
-        item.addEventListener("click", (e) => {
-          if (e.target.tagName !== "SELECT") {
-            if (visitedOverlay) {
-              visitedOverlay.setMap(null)
-              visitedOverlay = null
-              if (menuWrap) menuWrap.style.zIndex = "10" // 복원
-              console.log("Overlay closed by item click")
-            }
+      // 오버레이 외부 클릭 시 닫기
+      document.addEventListener("click", function closeOverlayOnOutsideClick(e) {
+        if (!content.contains(e.target) && e.target !== visitedBtn) {
+          if (visitedOverlay) {
+            visitedOverlay.setMap(null)
+            visitedOverlay = null
+            console.log("Overlay closed by outside click")
+            document.removeEventListener("click", closeOverlayOnOutsideClick)
           }
-        })
+        }
       })
 
+      // 스크롤 이벤트 전파 방지
       content.addEventListener("wheel", (e) => {
         e.stopPropagation()
       })
@@ -275,10 +244,11 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error("Visited restaurants button not found")
   }
 
+  // 지도 중심 변경 시 오버레이 위치 업데이트
   if (window.kakao && kakao.maps && kakao.maps.event) {
     kakao.maps.event.addListener(window.map, "center_changed", () => {
       if (visitedOverlay) {
-        const newPosition = getButtonPosition()
+        const newPosition = getOverlayPosition()
         if (newPosition) {
           visitedOverlay.setPosition(newPosition)
         }

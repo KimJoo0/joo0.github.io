@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>나만의 식당 방문리스트</title>
     <link rel="stylesheet" href="style.css">
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=58977c903459ab8dfa20181bf82abe1a&libraries=services"></script>
@@ -86,12 +86,26 @@
 <body>
     <div class="map_wrap">
         <div id="map"></div>
+        
+        <!-- 모바일 최적화 헤더 -->
+        <div class="mobile-header">
+            <div class="header-title">나만의 식당 방문리스트</div>
+            <div class="header-buttons">
+                <button id="search-toggle" class="control-btn search-toggle-btn">검색</button>
+                <div id="auth-container" class="auth-container">
+                    <div id="login-status" class="login-status">로그인하세요</div>
+                    <button id="auth-button" class="control-btn auth-btn">로그인</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 검색 패널 -->
         <div id="menu_wrap" class="bg_white">
             <div class="option">
                 <div>
                     <form id="searchForm">
-                        키워드 : <input type="text" value="" id="keyword" size="15"> 
-                        <button type="submit">검색하기</button> 
+                        <input type="text" placeholder="식당 이름, 지역 검색" id="keyword" size="15"> 
+                        <button type="submit">검색</button> 
                     </form>
                 </div>
             </div>
@@ -99,13 +113,15 @@
             <ul id="placesList"></ul>
             <div id="pagination"></div>
         </div>
-        <button id="visitedRestaurantsBtn" class="visited-btn">방문한 식당</button>
-        <div id="auth-container" class="auth-container">
-            <div id="login-status" class="login-status">로그인하세요</div>
-            <button id="auth-button" class="auth-btn">로그인</button>
+        
+        <!-- 하단 컨트롤 패널 -->
+        <div class="bottom-controls">
+            <button id="visitedRestaurantsBtn" class="control-btn visited-btn">방문한 식당</button>
         </div>
     </div>
+    
     <!-- 다른 스크립트 로드 -->
+    <script src="mobile-ui.js"></script>
     <script src="map-init.js"></script>
     <script src="ui-utils.js"></script>
     <script src="firebase-data.js"></script>

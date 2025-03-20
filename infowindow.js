@@ -1,11 +1,6 @@
 // infowindow.js
-
-// kakao maps api import (가정)
-// import kakao from './kakao';
-
-// isMobile function (가정)
 function isMobile() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  return window.innerWidth <= 768
 }
 
 function displayInfowindow(marker, place) {
@@ -58,9 +53,9 @@ function displayInfowindow(marker, place) {
       const initialRevisitCount = savedData ? savedData.revisitCount : "0"
 
       const content = document.createElement("div")
-      content.className = "infowindow-content"
+      content.className = "infowindow-content fade-in"
       content.innerHTML = `
-            <b>${placeData.name}</b><br>
+            <b>${placeData.name}</b>
             <div class="select-group">
                 <label>나이:</label>
                 <select id="ageSelect_${placeData.name}" onchange="updateStats('${placeData.name}')">
@@ -132,6 +127,7 @@ function displayInfowindow(marker, place) {
         window.currentOverlay.setMap(null)
       }
 
+      // kakao is assumed to be available globally from the Kakao Maps API script.
       const customOverlay = new kakao.maps.CustomOverlay({
         position: marker.getPosition(),
         content: content,
@@ -144,17 +140,16 @@ function displayInfowindow(marker, place) {
 
       // 모바일에서 인포윈도우가 열릴 때 검색창 z-index 조정
       if (isMobile()) {
-        document.getElementById("menu_wrap").style.zIndex = "0"
+        const menuWrap = document.getElementById("menu_wrap")
+        if (menuWrap && menuWrap.classList.contains("active")) {
+          menuWrap.classList.remove("active")
+        }
       }
 
       content.addEventListener("click", (e) => {
         if (e.target.tagName !== "SELECT" && e.target.tagName !== "OPTION") {
           customOverlay.setMap(null)
           window.currentOverlay = null
-          // 인포윈도우 닫힐 때 z-index 복구
-          if (isMobile()) {
-            document.getElementById("menu_wrap").style.zIndex = "10"
-          }
         }
       })
 
@@ -214,4 +209,5 @@ function displayInfowindow(marker, place) {
 
 // 전역 스코프에 함수 노출
 window.displayInfowindow = displayInfowindow
+window.isMobile = isMobile
 
