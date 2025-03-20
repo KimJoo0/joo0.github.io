@@ -100,11 +100,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // 화면 크기에 따른 UI 조정 함수
   function adjustUIForScreenSize() {
     const isMobileView = window.innerWidth <= 768
-
-    // 모바일 뷰에서는 기본적으로 검색 패널 닫기
-    if (isMobileView) {
-      menuWrap.classList.remove("active")
-    }
   }
 })
 
