@@ -555,7 +555,7 @@ select {
 
 /* 하단 컨트롤 패널 */
 .bottom-controls {
-  position: absolute;
+  position: fixed;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
