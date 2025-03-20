@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
       position: position,
       content: content,
       xAnchor: 0.5,
-      yAnchor: 0.3,
+      yAnchor: 1,
       zIndex: 20,
     })
 
