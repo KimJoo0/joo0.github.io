@@ -186,6 +186,10 @@ body {
   line-height: 1.5;
   box-sizing: border-box;
   transition: height 0.3s ease;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .infowindow-content b {
@@ -436,7 +440,6 @@ select {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  }
 }
 
 .overlaybox .boxtitle {
