@@ -467,7 +467,7 @@ select {
   font-weight: bold;
   flex: 1;
   min-width: 100px;
-  max-width: 150px; /* 최대 너비 제한 */
+  max-width: 250px; /* 최대 너비 제한 */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
