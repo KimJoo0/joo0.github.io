@@ -432,6 +432,11 @@ select {
   overflow-y: auto;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   z-index: 200; /* z-index 증가 */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  }
 }
 
 .overlaybox .boxtitle {
