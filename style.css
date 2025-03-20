@@ -1,388 +1,454 @@
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
-.map_wrap, .map_wrap * {
-    margin: 0;
-    padding: 0;
-    font-family: 'Malgun Gothic', dotum, '돋움', sans-serif;
-    font-size: 12px;
+.map_wrap,
+.map_wrap * {
+  margin: 0;
+  padding: 0;
+  font-family: "Malgun Gothic", dotum, "돋움", sans-serif;
+  font-size: 12px;
 }
-.map_wrap a, .map_wrap a:hover, .map_wrap a:active {
-    color: #000;
-    text-decoration: none;
+.map_wrap a,
+.map_wrap a:hover,
+.map_wrap a:active {
+  color: #000;
+  text-decoration: none;
 }
 .map_wrap {
-    position: relative;
-    width: 100%;
-    height: 100vh;
+  position: relative;
+  width: 100%;
+  height: 100vh;
 }
 #map {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 10;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
 }
 
 #menu_wrap {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    bottom: 10px;
-    width: 250px;
-    padding: 5px;
-    overflow-y: auto;
-    background: rgba(255, 255, 255, 0.7);
-    z-index: 10;
-    font-size: 12px;
-    border-radius: 8px; /* 통일: 10px → 8px */
-    border: 1px solid #fff;
-    box-sizing: border-box;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  bottom: 10px;
+  width: 250px;
+  padding: 5px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+  font-size: 12px;
+  border-radius: 8px;
+  border: 1px solid #fff;
+  box-sizing: border-box;
 }
 .bg_white {
-    background: #fff;
+  background: #fff;
 }
 #menu_wrap hr {
-    display: block;
-    height: 1px;
-    border: 0;
-    border-top: 2px solid #5F5F5F;
-    margin: 3px 0;
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 2px solid #5f5f5f;
+  margin: 3px 0;
 }
 #menu_wrap .option {
-    text-align: center;
+  text-align: center;
 }
 #menu_wrap .option p {
-    margin: 10px 0;
+  margin: 10px 0;
 }
 #menu_wrap .option button {
-    margin-left: 5px;
+  margin-left: 5px;
 }
 #placesList li {
-    list-style: none;
+  list-style: none;
 }
 #placesList .item {
-    position: relative;
-    border-bottom: 1px solid #888;
-    overflow: hidden;
-    cursor: pointer;
-    min-height: 75px;
+  position: relative;
+  border-bottom: 1px solid #888;
+  overflow: hidden;
+  cursor: pointer;
+  min-height: 75px;
 }
 #placesList .item span {
-    display: block;
-    margin-top: 4px;
+  display: block;
+  margin-top: 4px;
 }
-#placesList .item h5, #placesList .item .info {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
+#placesList .item h5,
+#placesList .item .info {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 #placesList .item .info {
-    padding: 10px 0 10px 55px;
+  padding: 10px 0 10px 55px;
 }
 #placesList .info .gray {
-    color: #8a8a8a;
+  color: #8a8a8a;
 }
 #placesList .info .jibun {
-    padding-left: 26px;
-    background: url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_jibun.png) no-repeat;
+  padding-left: 26px;
+  background: url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_jibun.png) no-repeat;
 }
 #placesList .info .tel {
-    color: #009900;
+  color: #009900;
 }
 #placesList .item .markerbg {
-    float: left;
-    position: absolute;
-    width: 34px;
-    height: 42px;
-    margin: 10px 0 0 10px;
-    background: url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png) no-repeat;
+  float: left;
+  position: absolute;
+  width: 34px;
+  height: 42px;
+  margin: 10px 0 0 10px;
+  background: url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png) no-repeat;
 }
-#placesList .item .marker_1 {background-position: 0 -10px;}
-#placesList .item .marker_2 {background-position: 0 -56px;}
-#placesList .item .marker_3 {background-position: 0 -102px;}
-#placesList .item .marker_4 {background-position: 0 -148px;}
-#placesList .item .marker_5 {background-position: 0 -194px;}
-#placesList .item .marker_6 {background-position: 0 -240px;}
-#placesList .item .marker_7 {background-position: 0 -286px;}
-#placesList .item .marker_8 {background-position: 0 -332px;}
-#placesList .item .marker_9 {background-position: 0 -378px;}
-#placesList .item .marker_10 {background-position: 0 -423px;}
-#placesList .item .marker_11 {background-position: 0 -470px;}
-#placesList .item .marker_12 {background-position: 0 -516px;}
-#placesList .item .marker_13 {background-position: 0 -562px;}
-#placesList .item .marker_14 {background-position: 0 -608px;}
-#placesList .item .marker_15 {background-position: 0 -654px;}
+#placesList .item .marker_1 {
+  background-position: 0 -10px;
+}
+#placesList .item .marker_2 {
+  background-position: 0 -56px;
+}
+#placesList .item .marker_3 {
+  background-position: 0 -102px;
+}
+#placesList .item .marker_4 {
+  background-position: 0 -148px;
+}
+#placesList .item .marker_5 {
+  background-position: 0 -194px;
+}
+#placesList .item .marker_6 {
+  background-position: 0 -240px;
+}
+#placesList .item .marker_7 {
+  background-position: 0 -286px;
+}
+#placesList .item .marker_8 {
+  background-position: 0 -332px;
+}
+#placesList .item .marker_9 {
+  background-position: 0 -378px;
+}
+#placesList .item .marker_10 {
+  background-position: 0 -423px;
+}
+#placesList .item .marker_11 {
+  background-position: 0 -470px;
+}
+#placesList .item .marker_12 {
+  background-position: 0 -516px;
+}
+#placesList .item .marker_13 {
+  background-position: 0 -562px;
+}
+#placesList .item .marker_14 {
+  background-position: 0 -608px;
+}
+#placesList .item .marker_15 {
+  background-position: 0 -654px;
+}
 #pagination {
-    margin: 10px auto;
-    text-align: center;
+  margin: 10px auto;
+  text-align: center;
 }
 #pagination a {
-    display: inline-block;
-    margin-right: 10px;
+  display: inline-block;
+  margin-right: 10px;
 }
 #pagination .on {
-    font-weight: bold;
-    cursor: default;
-    color: #777;
+  font-weight: bold;
+  cursor: default;
+  color: #777;
 }
 .bar-container {
-    margin: 10px 0;
+  margin: 10px 0;
 }
 .bar-label {
-    font-size: 12px;
-    margin-bottom: 5px;
+  font-size: 12px;
+  margin-bottom: 5px;
 }
 .bar {
-    width: 200px;
-    height: 20px;
-    background: #eee;
-    position: relative;
-    border-radius: 8px; /* 통일: 4px → 8px */
-    border: 1px solid #fff;
-    overflow: hidden;
+  width: 200px;
+  height: 20px;
+  background: #eee;
+  position: relative;
+  border-radius: 8px;
+  border: 1px solid #fff;
+  overflow: hidden;
 }
 .bar-segment {
-    height: 100%;
-    color: white;
-    text-align: center;
-    line-height: 20px;
-    transition: width 0.3s ease;
+  height: 100%;
+  color: white;
+  text-align: center;
+  line-height: 20px;
+  transition: width 0.3s ease;
 }
 .revisit-bar {
-    width: 200px;
-    height: 20px;
-    background: #eee;
-    position: relative;
-    border-radius: 8px; /* 통일: 4px → 8px */
-    border: 1px solid #fff;
-    overflow: hidden;
+  width: 200px;
+  height: 20px;
+  background: #eee;
+  position: relative;
+  border-radius: 8px;
+  border: 1px solid #fff;
+  overflow: hidden;
 }
 .revisit-segment {
-    height: 100%;
-    position: absolute;
-    color: white;
-    text-align: center;
-    line-height: 20px;
-    transition: width 0.3s ease;
+  height: 100%;
+  position: absolute;
+  color: white;
+  text-align: center;
+  line-height: 20px;
+  transition: width 0.3s ease;
 }
 select {
-    margin: 5px;
-    padding: 5px;
-    border-radius: 8px; /* 통일: 4px → 8px */
-    border: 1px solid #fff;
+  margin: 5px;
+  padding: 5px;
+  border-radius: 8px;
+  border: 1px solid #fff;
 }
 @media (max-width: 768px) {
-    #menu_wrap {
-        width: 100%;
-        max-width: 250px;
-        bottom: auto;
-        height: auto;
-        max-height: 30vh;
-    }
+  #menu_wrap {
+    width: 100%;
+    max-width: 250px;
+    bottom: auto;
+    height: auto;
+    max-height: 30vh;
+  }
 }
 
 /* 인포윈도우 스타일 */
 .infowindow-content {
-    padding: 10px;
-    min-width: 100px;
-    max-width: 350px;
-    height: auto;
-    background: #fff;
-    border: 1px solid #000000;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    font-size: 14px;
-    line-height: 1.5;
-    box-sizing: border-box;
-    transition: height 0.3s ease;
+  padding: 10px;
+  min-width: 100px;
+  max-width: 350px;
+  height: auto;
+  background: #fff;
+  border: 1px solid #000000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  line-height: 1.5;
+  box-sizing: border-box;
+  transition: height 0.3s ease;
 }
 
 .select-group {
-    margin: 10px 0;
+  margin: 10px 0;
 }
 
 .select-group label {
-    margin-right: 5px;
-    font-weight: bold;
+  margin-right: 5px;
+  font-weight: bold;
 }
 
 .bar-segment.revisit-intent {
-    background: linear-gradient(to right, #4CAF50, #66BB6A);
+  background: linear-gradient(to right, #4caf50, #66bb6a);
 }
 
 .revisit-segment.revisit-1 {
-    background: linear-gradient(to right, #2196F3, #42A5F5);
+  background: linear-gradient(to right, #2196f3, #42a5f5);
 }
 .revisit-segment.revisit-2 {
-    background: linear-gradient(to right, #1976D2, #1E88E5);
+  background: linear-gradient(to right, #1976d2, #1e88e5);
 }
 .revisit-segment.revisit-3 {
-    background: linear-gradient(to right, #0D47A1, #1565C0);
+  background: linear-gradient(to right, #0d47a1, #1565c0);
 }
 
 .bar-segment.like-probability {
-    background: linear-gradient(to right, #FF5722, #FF7043);
+  background: linear-gradient(to right, #ff5722, #ff7043);
 }
 
 .revisit-section {
-    margin: 10px 0;
+  margin: 10px 0;
 }
 
 .revisit-section label {
-    font-weight: bold;
-    margin-right: 5px;
+  font-weight: bold;
+  margin-right: 5px;
 }
 
 .revisit-intent-select {
-    background-color: #f9f9f9;
-    border: 1px solid #fff;
-    border-radius: 8px; /* 통일: 4px → 8px */
-    transition: border-color 0.3s ease;
+  background-color: #f9f9f9;
+  border: 1px solid #fff;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
 }
 
 .revisit-intent-select:focus {
-    border-color: #4CAF50;
-    outline: none;
+  border-color: #4caf50;
+  outline: none;
 }
 
 .revisit-count-section {
-    margin-top: 10px;
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: opacity 0.3s ease, max-height 0.3s ease;
+  margin-top: 10px;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
 }
 
 .revisit-count-section.visible {
-    opacity: 1;
-    max-height: 50px;
+  opacity: 1;
+  max-height: 50px;
 }
 
 .revisit-count-select {
-    background-color: #f9f9f9;
-    border: 1px solid #fff;
-    border-radius: 8px; /* 통일: 4px → 8px */
-    transition: border-color 0.3s ease;
+  background-color: #f9f9f9;
+  border: 1px solid #fff;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
 }
 
 .revisit-count-select:focus {
-    border-color: #2196F3;
-    outline: none;
+  border-color: #2196f3;
+  outline: none;
 }
 
 /* Visited Restaurants Button */
 .visited-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 10px 15px;
-    background: #5e87ff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    z-index: 15;
-    font-size: 14px;
-    transition: background 0.3s ease;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 10px 15px;
+  background: #5e87ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 15;
+  font-size: 14px;
+  transition: background 0.3s ease;
 }
 
 .visited-btn:hover {
-    background: #cfcfcf;
+  background: #cfcfcf;
 }
 
 /* Custom Overlay Styles */
 .overlaybox {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px 10px;
-    width: 300px;
-    max-height: 350px;
-    overflow-y: auto;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px 10px;
+  width: 300px;
+  max-height: 350px;
+  overflow-y: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .overlaybox .boxtitle {
-    color: #333;
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 8px;
-    text-align: center;
+  color: #333;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  text-align: center;
 }
-
 
 .overlaybox ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    max-height: 300px; /* 스크롤을 위한 최대 높이 */
-    overflow-y: auto;  /* 세로 스크롤 활성화 */
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
-
 .overlaybox li {
-    background: #f9f9f9;
-    padding: 8px 10px;
-    margin-bottom: 5px;
-    border-radius: 4px;
-    color: #333;
-    line-height: 1.5;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background: #f9f9f9;
+  padding: 8px 10px;
+  margin-bottom: 5px;
+  border-radius: 4px;
+  color: #333;
+  line-height: 1.5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .overlaybox li span {
-    display: inline-block;
+  display: inline-block;
 }
 
 .overlaybox li .title {
-    font-size: 13px;
-    font-weight: bold;
-    flex: 1;
+  font-size: 13px;
+  font-weight: bold;
+  flex: 1;
 }
 
 .overlaybox li .intent,
 .overlaybox li .count {
-    font-size: 12px;
-    margin-left: 10px;
+  font-size: 12px;
+  margin-left: 10px;
 }
 
 .overlaybox li:hover {
-    background: #e0e0e0;
-    color: #000;
+  background: #e0e0e0;
+  color: #000;
 }
 
-
-
 .overlaybox li select {
-    padding: 2px;
-    font-size: 12px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    background: #fff;
-    cursor: pointer;
+  padding: 2px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
 }
 
 .overlaybox li .intent-select {
-    width: 100px;
-    margin-left: 10px;
+  width: 100px;
+  margin-left: 10px;
 }
 
 .overlaybox li .count-select {
-    width: 60px;
-    margin-left: 10px;
+  width: 60px;
+  margin-left: 10px;
 }
 
-overlaybox .visited-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    max-height: 300px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* 모바일 스크롤 개선 */
+.overlaybox .visited-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 300px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
+
+/* 인증 관련 스타일 */
+.auth-container {
+  position: absolute;
+  top: 10px;
+  right: 150px;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 5px 10px;
+  border-radius: 8px;
+  z-index: 15;
+}
+
+.login-status {
+  margin-right: 10px;
+  font-size: 12px;
+  color: #333;
+}
+
+.auth-btn {
+  padding: 5px 10px;
+  background: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.3s ease;
+}
+
+.auth-btn:hover {
+  background: #3367d6;
+}
+
