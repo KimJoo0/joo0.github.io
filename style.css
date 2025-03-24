@@ -425,29 +425,36 @@ select {
 .overlaybox {
   background: #fff;
   border-radius: 8px;
-  padding: 15px;
+  padding: 0; /* 패딩 제거 */
   width: 90vw;
   max-width: 350px;
-  max-height: 200px;
-  overflow-y: auto;
+  max-height: 70vh; /* 최대 높이 조정 */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* 내용이 넘치면 숨김 */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  z-index: 200; /* z-index 증가 */
+  z-index: 200;
 }
 
 .overlaybox .boxtitle {
   color: #333;
   font-size: 16px;
   font-weight: bold;
-  margin-bottom: 12px;
+  padding: 12px 15px;
   text-align: center;
-  padding-bottom: 8px;
   border-bottom: 1px solid #eee;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .overlaybox ul {
   margin: 0;
-  padding: 0;
+  padding: 10px;
   list-style: none;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .overlaybox li {
@@ -457,9 +464,9 @@ select {
   border-radius: 6px;
   color: #333;
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-between;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
 }
 
 .overlaybox li .title {
@@ -467,14 +474,14 @@ select {
   font-weight: bold;
   flex: 1;
   min-width: 100px;
-  max-width: 250px; /* 최대 너비 제한 */
+  max-width: 180px; /* 최대 너비 제한 */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .overlaybox li select {
-  padding: 4px 6px;
+  padding: 6px 8px;
   font-size: 12px;
   border-radius: 4px;
   border: 1px solid #ddd;
@@ -483,11 +490,13 @@ select {
 }
 
 .overlaybox li .intent-select {
-  width: 70px; /* 너비 축소 */
+  width: 80px; /* 너비 조정 */
+  text-align: center;
 }
 
 .overlaybox li .count-select {
-  width: 50px; /* 너비 축소 */
+  width: 60px; /* 너비 조정 */
+  text-align: center;
 }
 
 /* 모바일 최적화 */
@@ -512,18 +521,35 @@ select {
 
   .overlaybox {
     width: 85vw;
-    max-height: 60vh; /* 모바일에서 최대 높이 조정 */
-    padding: 10px;
+    max-height: 60vh;
+  }
+
+  .overlaybox ul {
+    padding: 8px;
   }
 
   .overlaybox li {
-    padding: 8px;
-    margin-bottom: 6px;
+    padding: 10px;
+    margin-bottom: 8px;
+    justify-content: space-between;
   }
 
   .overlaybox li .title {
     font-size: 13px;
-    max-width: 120px; /* 모바일에서 더 좁게 */
+    max-width: 150px; /* 모바일에서 너비 조정 */
+  }
+
+  .overlaybox li select {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .overlaybox li .intent-select {
+    width: 70px;
+  }
+
+  .overlaybox li .count-select {
+    width: 50px;
   }
 
   select {

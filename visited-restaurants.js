@@ -14,8 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const ul = document.createElement("ul")
     ul.className = "visited-list"
-    ul.style.maxHeight = isMobile() ? "50vh" : "60vh"
-    ul.style.overflowY = "auto"
+    // 개별 스크롤 설정 제거
+    // ul.style.maxHeight = isMobile() ? "50vh" : "60vh"
+    // ul.style.overflowY = "auto"
 
     // 로딩 메시지 표시
     const loadingLi = document.createElement("li")
@@ -84,31 +85,55 @@ document.addEventListener("DOMContentLoaded", () => {
           li.innerHTML = '<span class="title">방문한 식당이 없습니다.</span>'
           ul.appendChild(li)
         } else {
+          // 방문한 식당 정렬 (이름 기준)
+          visitedPlaces.sort((a, b) => a.name.localeCompare(b.name, "ko"))
+
           visitedPlaces.forEach((place) => {
             const li = document.createElement("li")
+
+            // 데이터 속성 추가하여 이벤트 처리 시 참조할 수 있도록 함
+            li.dataset.name = place.name
+            li.dataset.intent = place.intent
+            li.dataset.count = place.count
+
             li.innerHTML = `
-                        <span class="title">${place.name}</span>
-                        <select class="intent-select" data-name="${place.name}">
-                            <option value="아직방문안함" ${place.intent === "아직방문안함" ? "selected" : ""}>아직방문안함</option>
-                            <option value="X" ${place.intent === "X" ? "selected" : ""}>X</option>
-                            <option value="O" ${place.intent === "O" ? "selected" : ""}>O</option>
-                        </select>
-                        <select class="count-select" data-name="${place.name}">
-                            <option value="0" ${place.count === "0" ? "selected" : ""}>0</option>
-                            <option value="1" ${place.count === "1" ? "selected" : ""}>1</option>
-                            <option value="2" ${place.count === "2" ? "selected" : ""}>2</option>
-                            <option value="3+" ${place.count === "3+" ? "selected" : ""}>3+</option>
-                        </select>
-                    `
+                <span class="title" title="${place.name}">${place.name}</span>
+                <select class="intent-select" data-name="${place.name}">
+                    <option value="아직방문안함" ${place.intent === "아직방문안함" ? "selected" : ""}>아직방문안함</option>
+                    <option value="X" ${place.intent === "X" ? "selected" : ""}>X</option>
+                    <option value="O" ${place.intent === "O" ? "selected" : ""}>O</option>
+                </select>
+                <select class="count-select" data-name="${place.name}" ${place.intent !== "O" ? "disabled" : ""}>
+                    <option value="0" ${place.count === "0" ? "selected" : ""}>0</option>
+                    <option value="1" ${place.count === "1" ? "selected" : ""}>1</option>
+                    <option value="2" ${place.count === "2" ? "selected" : ""}>2</option>
+                    <option value="3+" ${place.count === "3+" ? "selected" : ""}>3+</option>
+                </select>
+            `
             ul.appendChild(li)
           })
 
-          // 이벤트 리스너 추가
-          ul.querySelectorAll(".intent-select").forEach((select) => {
-            select.addEventListener("change", function () {
-              const name = this.dataset.name
-              const newIntent = this.value
-              const countSelect = ul.querySelector(`.count-select[data-name="${name}"]`)
+          // 이벤트 리스너 추가 - 이벤트 위임 방식으로 변경하여 버그 수정
+          ul.addEventListener("change", (event) => {
+            const target = event.target
+
+            // 재방문 의사 변경 이벤트
+            if (target.classList.contains("intent-select")) {
+              const name = target.dataset.name
+              const newIntent = target.value
+              const listItem = target.closest("li")
+              const countSelect = listItem.querySelector(".count-select")
+
+              // 재방문 의사에 따라 재방문 횟수 선택 활성화/비활성화
+              if (newIntent === "O") {
+                countSelect.disabled = false
+              } else {
+                countSelect.disabled = true
+                // X로 변경 시 재방문 횟수는 0으로 초기화
+                if (newIntent === "X") {
+                  countSelect.value = "0"
+                }
+              }
 
               const data = {
                 revisitIntent: newIntent,
@@ -116,42 +141,49 @@ document.addEventListener("DOMContentLoaded", () => {
               }
 
               // 데이터 저장
-              savePlaceData(name, data).catch((error) => {
-                console.error("데이터 저장 실패:", error)
-              })
+              savePlaceData(name, data)
+                .then(() => {
+                  console.log(`${name}의 재방문 의사가 ${newIntent}로 변경되었습니다.`)
 
-              if (newIntent === "아직방문안함") {
-                // 목록에서 제거
-                const listItem = select.closest("li")
-                if (listItem) {
-                  listItem.remove()
-                }
+                  // 아직방문안함으로 변경 시 목록에서 제거
+                  if (newIntent === "아직방문안함") {
+                    listItem.remove()
 
-                // 목록이 비었는지 확인
-                if (ul.children.length === 0) {
-                  const emptyLi = document.createElement("li")
-                  emptyLi.innerHTML = '<span class="title">방문한 식당이 없습니다.</span>'
-                  ul.appendChild(emptyLi)
-                }
-              }
-            })
-          })
+                    // 목록이 비었는지 확인
+                    if (ul.children.length === 0) {
+                      const emptyLi = document.createElement("li")
+                      emptyLi.innerHTML = '<span class="title">방문한 식당이 없습니다.</span>'
+                      ul.appendChild(emptyLi)
+                    }
+                  }
+                })
+                .catch((error) => {
+                  console.error("데이터 저장 실패:", error)
+                  alert("변경사항 저장에 실패했습니다.")
+                })
+            }
 
-          ul.querySelectorAll(".count-select").forEach((select) => {
-            select.addEventListener("change", function () {
-              const name = this.dataset.name
-              const intentSelect = ul.querySelector(`.intent-select[data-name="${name}"]`)
+            // 재방문 횟수 변경 이벤트
+            else if (target.classList.contains("count-select")) {
+              const name = target.dataset.name
+              const listItem = target.closest("li")
+              const intentSelect = listItem.querySelector(".intent-select")
 
               const data = {
                 revisitIntent: intentSelect.value,
-                revisitCount: this.value,
+                revisitCount: target.value,
               }
 
               // 데이터 저장
-              savePlaceData(name, data).catch((error) => {
-                console.error("데이터 저장 실패:", error)
-              })
-            })
+              savePlaceData(name, data)
+                .then(() => {
+                  console.log(`${name}의 재방문 횟수가 ${target.value}로 변경되었습니다.`)
+                })
+                .catch((error) => {
+                  console.error("데이터 저장 실패:", error)
+                  alert("변경사항 저장에 실패했습니다.")
+                })
+            }
           })
         }
       })
@@ -208,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
       position: position,
       content: content,
       xAnchor: 0.5,
-      yAnchor: 2.5,
+      yAnchor: 1.5, // 위치 조정
       zIndex: 20,
     })
 
@@ -217,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.log("Overlay opened")
 
       // 오버레이 외부 클릭 시 닫기
-      document.addEventListener("click", function closeOverlayOnOutsideClick(e) {
+      const closeOverlayOnOutsideClick = (e) => {
         if (!content.contains(e.target) && e.target !== visitedBtn) {
           if (visitedOverlay) {
             visitedOverlay.setMap(null)
@@ -226,7 +258,14 @@ document.addEventListener("DOMContentLoaded", () => {
             document.removeEventListener("click", closeOverlayOnOutsideClick)
           }
         }
-      })
+      }
+
+      // 기존 이벤트 리스너 제거 후 새로 추가
+      document.removeEventListener("click", closeOverlayOnOutsideClick)
+      // 약간의 지연을 두어 버튼 클릭 이벤트와 겹치지 않도록 함
+      setTimeout(() => {
+        document.addEventListener("click", closeOverlayOnOutsideClick)
+      }, 100)
 
       // 스크롤 이벤트 전파 방지
       content.addEventListener("wheel", (e) => {
@@ -247,8 +286,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // 지도 중심 변경 시 오버레이 위치 업데이트
-  if (window.kakao && kakao.maps && kakao.maps.event) {
-    kakao.maps.event.addListener(window.map, "center_changed", () => {
+  if (window.kakao && window.kakao.maps && window.kakao.maps.event) {
+    window.kakao.maps.event.addListener(window.map, "center_changed", () => {
       if (visitedOverlay) {
         const newPosition = getOverlayPosition()
         if (newPosition) {
@@ -261,7 +300,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function isMobile() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    return (
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+      window.innerWidth <= 768
+    )
   }
 })
 
