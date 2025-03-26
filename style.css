@@ -79,7 +79,7 @@ body {
 }
 
 #menu_wrap.active {
-  max-height: 60vh;
+  max-height: 80vh;
   overflow-y: auto;
   z-index: 100; /* z-index 증가 */
 }
